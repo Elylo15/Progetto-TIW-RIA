@@ -1,0 +1,45 @@
+@charset "UTF-8";
+/* Aggiungi il CSS qui */
+    body {
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        width: 300px;
+        margin: 0 auto;
+    }
+
+    form {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 10px;
+    }
+
+    label {
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+        margin-top: 20px;
+        padding: 10px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .error-message {
+        color: red;
+        text-align: center;
+        margin-top: 20px;
+    }
