@@ -7,13 +7,14 @@
 <link rel="stylesheet" type="text/css" media="all" href="css/index.css" />
 
 <script src="utils.js" charset="utf-8" defer></script>
+<script src="loginManagement.js" charset="utf-8" defer></script>
 
 </head>
 <body>
     <div class="container">
         <h1>Benvenuto nella piattaforma di gestione dei documenti</h1>
         <!-- Form per il login -->
-        <form action="CheckLogin" method="POST">
+        <form action="#">
             <div class="form-group">
                 <label for="username">username:</label>
                 <input type="text" id="username" name="username">
@@ -22,26 +23,33 @@
                 <label for="pwd">password:</label>
                 <input type="password" id="pwd" name="pwd">
             </div>
-            <input type="submit" value="login">
+            <input type="submit" value="login" id="loginbutton">
         </form>
         
         <!-- Form per la registrazione -->
-        <form action="CheckLogin" method="POST">
+        <form action="#">
             <div class="form-group">
                 <label for="username">username:</label>
                 <input type="text" id="username" name="username">
             </div>
             <div class="form-group">
+                <label for="pwd">email:</label>
+                <input type="text" id="pwd" name="email">
+            </div>
+            <div class="form-group">
                 <label for="pwd">password:</label>
                 <input type="password" id="pwd" name="pwd">
             </div>
-            <input type="submit" value="login">
+            <div class="form-group">
+                <label for="pwd">Repeat password:</label>
+                <input type="password" id="pwd" name="repeatpwd">
+            </div>
+            <input type="submit" value="login" id="registrationbutton">
         </form>
         <br>
         
-        <!-- Utilizza Thymeleaf per visualizzare il messaggio di errore -->
-        <div th:if="${error}" class="error-message">
-            <p th:text="${error}"></p>
+        <div class="error-message">
+            <p id="error"></p>
         </div>
     </div>
 </body>
