@@ -1,6 +1,6 @@
-DROP DATABASE IF EXISTS `dbDocumentManager`;
-CREATE  DATABASE `dbDocumentManager`;
-USE `dbDocumentManager`;
+DROP DATABASE IF EXISTS `dbDocumentManagerRIA`;
+CREATE  DATABASE `dbDocumentManagerRIA`;
+USE `dbDocumentManagerRIA`;
 
 DROP TABLE IF EXISTS `User`;
 CREATE TABLE `User` (
