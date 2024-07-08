@@ -13,8 +13,12 @@
 <body>
     <div class="container">
         <h1>Benvenuto nella piattaforma di gestione dei documenti</h1>
+        <!-- Pulsanti per alternare tra login e registrazione -->
+        <button id="showLogin">Login</button>
+        <button id="showRegistration">Registrazione</button>
+        
         <!-- Form per il login -->
-        <form action="#">
+        <form id="loginForm" action="#">
             <div class="form-group">
                 <label for="username">username:</label>
                 <input type="text" id="username" name="username">
@@ -27,7 +31,7 @@
         </form>
         <br>
         <!-- Form per la registrazione -->
-        <form action="#">
+        <form id="registrationForm" action="#" class="hidden">
             <div class="form-group">
                 <label for="usernameR">username:</label>
                 <input type="text" id="usernameR" name="usernameR">

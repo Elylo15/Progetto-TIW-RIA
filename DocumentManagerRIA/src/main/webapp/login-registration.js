@@ -69,5 +69,17 @@
     	 form.reportValidity();
     }
   });
+  
+    document.getElementById('showLogin').addEventListener('click', function() {
+            document.getElementById('loginForm').classList.remove('hidden');
+            document.getElementById('registrationForm').classList.add('hidden');
+        });
+        
+   document.getElementById('showRegistration').addEventListener('click', function() {
+	   document.getElementById('registrationForm').classList.remove('hidden');
+       document.getElementById('loginForm').classList.add('hidden');
+        });
+  
+
 
 })();
