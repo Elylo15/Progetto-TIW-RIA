@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import it.polimi.tiw.project.beans.User;
 import it.polimi.tiw.project.dao.UserDAO;
 
 @WebServlet("/CheckLogin")
+@MultipartConfig
 public class CheckLogin extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private Connection connection = null;
@@ -32,20 +34,11 @@ public class CheckLogin extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO: non prende correttamente i parametri qui ??????
-		Map<String, String[]> params = request.getParameterMap();
-		for(String p : params.keySet()) {
-			System.out.println("Parametro: " + p);
-			for(String val : params.get(p))
-				System.out.println("\tParametro: " + val);
-		}
-		
 		// obtain and escape params
 		String usrn = null;
 		String pwd = null;
 		usrn = StringEscapeUtils.escapeJava(request.getParameter("username"));
 		pwd = StringEscapeUtils.escapeJava(request.getParameter("pwd"));
-		System.out.println(usrn + " " + pwd);
 		
 		// if parameters are empty return an error
 		if (usrn == null || pwd == null || usrn.isEmpty() || pwd.isEmpty() ) {

@@ -1,5 +1,5 @@
 /**
- * Login management
+ * Login and Registration management
  */
 
 (function() { // avoid variables ending up in the global scope
@@ -17,7 +17,7 @@
               case 200:
             	sessionStorage.setItem('username', message);
             	console.log("login ok");
-                window.location.href = "WEB-INF/HomePageRIA.html";
+                window.location.href = "HomePageRIA.html";
                 break;
               case 400: // bad request
                 document.getElementById("error").textContent = message;
