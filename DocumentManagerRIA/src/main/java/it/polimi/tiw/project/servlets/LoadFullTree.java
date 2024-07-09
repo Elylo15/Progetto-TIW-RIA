@@ -62,6 +62,6 @@ public class LoadFullTree extends HttpServlet {
 		response.setCharacterEncoding("UTF-8");
 		response.getWriter().write(json);
 	}
-	}
+	
 
 }
