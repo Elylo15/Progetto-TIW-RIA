@@ -5,7 +5,6 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -48,7 +47,7 @@ public class LoadFullTree extends HttpServlet {
 		FolderDAO fDAO = new FolderDAO(connection);
 		List<Folder> rootFolders = null;
 		try {
-			rootFolders = fDAO.fetchRootFoldersAndSubFolders(u.getUsername());
+			rootFolders = fDAO.fetchAllTree(u.getUsername());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
 			response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Failure in user's folders database extraction");
