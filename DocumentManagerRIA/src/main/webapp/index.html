@@ -17,40 +17,39 @@
         
         <!-- Form per il login -->
         <form id="loginForm" action="#">
-        	<button id="showRegistration">Vai alla Registrazione</button>
+        	<button type="button" id="showRegistration" >Vai alla Registrazione</button>
             <div class="form-group">
                 <label for="username">username:</label>
                 <input type="text" id="username" name="username" required>
             </div>
             <div class="form-group">
                 <label for="pwd">password:</label>
-                <input type="password" id="pwd" name="pwd"  required oninput="togglePasswordVisibility('pwd')">
-                <input type="checkbox" id="showPasswordLogin" onclick="togglePasswordVisibility('pwd')"> Mostra password
-
+                <input type="password" id="pwd" name="pwd"  required>
+                <!--  <input type="checkbox" id="showPasswordLogin" onclick="togglePasswordVisibility('pwd')"> Mostra password-->
             </div>
             <input type="button" value="Login" id="loginbutton">
         </form>
         <br>
         <!-- Form per la registrazione -->
         <form id="registrationForm" action="#" class="hidden">
-        	<button id="showLogin">Vai al Login</button>
+        	<button type="button" id="showLogin">Vai al Login</button>
             <div class="form-group">
                 <label for="usernameR">username:</label>
-                <input type="text" id="usernameR" name="usernameR">
+                <input type="text" id="usernameR" name="usernameR" required>
             </div>
             <div class="form-group">
                 <label for="emailR">email:</label>
-                <input type="text" id="emailR" name="emailR">
+                <input type="text" id="emailR" name="emailR" required>
             </div>
             <div class="form-group">
                 <label for="pwdR">password:</label>
-                <input type="password" id="pwdR" name="pwdR">
-                <input type="checkbox" id="showPasswordRegister" onclick="togglePasswordVisibility('pwdR')"> Mostra password
+                <input type="password" id="pwdR" name="pwdR" required>
+                <!-- <input type="checkbox" id="showPasswordRegister" onclick="togglePasswordVisibility('pwdR')"> Mostra password-->
             </div>
             <div class="form-group">
                 <label for="repeatpwdR">Repeat password:</label>
-                <input type="password" id="repeatpwdR" name="repeatpwdR">
-                <input type="checkbox" id="showRepeaterPasswordRegister" onclick="togglePasswordVisibility('repeatpwdR')"> Mostra password
+                <input type="password" id="repeatpwdR" name="repeatpwdR" required>
+                <!-- <input type="checkbox" id="showRepeaterPasswordRegister" onclick="togglePasswordVisibility('repeatpwdR')"> Mostra password-->
 
             </div>
             <input type="button" value="Register" id="registrationbutton" onclick="validatePassword()">
@@ -59,8 +58,6 @@
         
         <div class="error-message">
             <p id="error"></p>
-            <p id="errorEmail"></p>
-            <p id="errorPassword"></p>
         </div>
     </div>
 </body>
