@@ -143,11 +143,6 @@
 			// Resetta il messaggio di errore se le password corrispondono
 			error.textContent = "";
 			return true;
-			// Puoi procedere con l'invio del form o con altre operazioni necessarie
-			// Esempio: makeCall("POST", 'CheckRegistration', document.getElementById('registrationForm'), ...);
 		}
 	}
-
-
-
 })();
