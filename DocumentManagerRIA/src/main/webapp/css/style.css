@@ -75,6 +75,10 @@ img {
   opacity: 0.5;
 }
 
+.dragging::before, .dragging::after{
+	display: none !important;
+}
+
 body {
   /* Prevent the user selecting text in the example */
   user-select: none;

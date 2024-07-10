@@ -12,7 +12,7 @@
 			pageOrchestrator.refresh();
 		} // display initial content
 	}, false);
-	
+
 
 	// Constructors of view components
 
@@ -28,7 +28,7 @@
 		this.reset = function() {
 			this.treecontainer.style.visibility = "hidden";
 		}
-		
+
 		// Retrieves the information form the server
 		this.show = function() {
 			var self = this;
@@ -44,7 +44,7 @@
 								return;
 							}
 							self.update(self.treebodycontainer, treeToShow); // self visible by closure
-							// if (next) next(); // show the default element of the list if present
+							self.createBin(self.treebodycontainer);
 
 						} else if (req.status == 403) {
 							// Utente non autorizzato, lo slogga
@@ -57,7 +57,7 @@
 					}
 				});
 		}
-		
+
 		// Displays the updated tree
 		this.update = function buildTree(parentElement, folders) {
 			var self = this;
@@ -99,29 +99,64 @@
 						documentItem.appendChild(documentIcon);
 						documentItem.appendChild(documentName);
 						documentsList.appendChild(documentItem);
+						
+						self.setUpDraggableDocs(documentItem);
 					});
 					folderItem.appendChild(documentsList);
 				}
 
 				parentElement.appendChild(folderItem);
-
 			});
 		}
+		
+		this.createBin = function(parentElement){
+			// Generazione del cestino
+			var binItem = document.createElement("li");
+			var binContainer = document.createElement("div");
+			binContainer.classList.add("rootFolder");
+
+			// Aggiunge l'icona del cestino e il nome
+			var icon = document.createElement("span");
+			icon.innerHTML = '<img src="img/bin.png">';
+			var binName = document.createElement("span");
+			binName.textContent = " Cestino";
+
+			binContainer.appendChild(icon);
+			binContainer.appendChild(binName);
+			binItem.appendChild(binContainer);
+			parentElement.appendChild(binItem);
+		}
+
+		this.setUpDraggableDocs = function(docContainer) {
+			docContainer.setAttribute("draggable", true);
+			docContainer.addEventListener("dragstart", (ev) => {
+				// store a ref. on the dragged elem
+				dragged = ev.target;
+				// make it half transparent
+				ev.target.classList.add("dragging");
+			}, false);
+			docContainer.addEventListener("dragend", (ev) => {
+				// reset the transparency
+				ev.target.classList.remove("dragging");
+			}, false);
+		}
+		
+		
 	}
-	
+
 	// Handles page loading and refreshing
-	function PageOrchestrator(){
+	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
 		var treeContainer = document.getElementById("id_tree");
 		var treeBodyContainer = document.getElementById("id_treebody");
-		
-		this.start = function(){
+
+		this.start = function() {
 			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer);
 			folderTree.show(); // Mostra l'albero delle cartelle
 		};
-		
+
 		this.refresh = function() { // currentMission initially null at start
-	      alertContainer.textContent = "";        // not null after creation of status change
-	    };
+			alertContainer.textContent = "";        // not null after creation of status change
+		};
 	}
 }	
