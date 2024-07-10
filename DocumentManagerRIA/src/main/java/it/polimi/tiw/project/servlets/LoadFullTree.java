@@ -1,6 +1,10 @@
 package it.polimi.tiw.project.servlets;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
@@ -56,11 +60,13 @@ public class LoadFullTree extends HttpServlet {
 		// Convert rootFolders to JSON
 		String json = new Gson().toJson(rootFolders);
 		
-		response.setStatus(HttpServletResponse.SC_OK);
-		response.setContentType("application/json");
-		response.setCharacterEncoding("UTF-8");
-		response.getWriter().write(json);
+        // Invia la risposta JSON
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(json);
 	}
+
 	
 
 }
