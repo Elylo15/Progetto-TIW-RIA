@@ -1,27 +1,18 @@
 {
 	// Page components
-	let folderTree, documentInfo, pageOrchestrator = new PageOrcherstrator();
+	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator();
 
 	// on HomePageRia.html load function
 	window.addEventListener("load", () => {
 		if (sessionStorage.getItem("username") == null) {
 			window.location.href = "index.html";
 		} else {
+			// displayFolderTree();
 			pageOrchestrator.start(); // initialize the components
 			pageOrchestrator.refresh();
 		} // display initial content
 	}, false);
-
-
-	// Funzione per creare e mostrare l'albero delle cartelle
-	function displayFolderTree() {
-		var alertDiv = document.getElementById("id_alert");
-		var treeContainer = document.getElementById("id_tree");
-		var treeBodyContainer = document.getElementById("id_treebody");
-
-		folderTree = new FolderTree(alertDiv, treeContainer, treeBodyContainer);
-		folderTree.show(); // Mostra l'albero delle cartelle
-	}
+	
 
 	// Constructors of view components
 
@@ -37,7 +28,8 @@
 		this.reset = function() {
 			this.treecontainer.style.visibility = "hidden";
 		}
-
+		
+		// Retrieves the information form the server
 		this.show = function() {
 			var self = this;
 			makeCall("GET", "LoadFullTree", null,
@@ -51,7 +43,7 @@
 								self.alert.textContent = "Non ci sono cartelle o documenti da mostrare!";
 								return;
 							}
-							buildTree(treebodycontainer, treeToShow); // self visible by closure
+							self.update(self.treebodycontainer, treeToShow); // self visible by closure
 							// if (next) next(); // show the default element of the list if present
 
 						} else if (req.status == 403) {
@@ -65,10 +57,10 @@
 					}
 				});
 		}
-
-
-
-		function buildTree(parentElement, folders) {
+		
+		// Displays the updated tree
+		this.update = function buildTree(parentElement, folders) {
+			var self = this;
 			parentElement.innerHTML = "";
 			folders.forEach(function(folder) {
 				var folderItem = document.createElement("li");
@@ -86,23 +78,23 @@
 				folderItem.appendChild(folderContainer);
 
 				// Controlla se ci sono sottocartelle
-				if (folder.subfolders.length > 0) {
+				if (folder.subFolders.length > 0) {
 					var subfolderList = document.createElement("ul");
 					subfolderList.classList.add("subfolder");
-					buildTree(subfolderList, folder.subfolders); // Chiamata ricorsiva per le sottocartelle
+					self.update(subfolderList, folder.subFolders); // Chiamata ricorsiva per le sottocartelle
 					folderItem.appendChild(subfolderList);
 				}
 
 				// Aggiunge i documenti se presenti
-				if (folder.documents.length > 0) {
+				if (folder.hasOwnProperty("documents")) {
 					var documentsList = document.createElement("ul");
 					documentsList.classList.add("documents");
-					folder.documents.forEach(function(document) {
+					folder.documents.forEach(function(doc) {
 						var documentItem = document.createElement("li");
 						var documentIcon = document.createElement("span");
 						documentIcon.innerHTML = '<img src="img/document.png">';
 						var documentName = document.createElement("span");
-						documentName.textContent = document.name;
+						documentName.textContent = doc.name;
 
 						documentItem.appendChild(documentIcon);
 						documentItem.appendChild(documentName);
@@ -114,10 +106,22 @@
 				parentElement.appendChild(folderItem);
 
 			});
-
-
-			// Avvia la costruzione dell'albero partendo dalle radici
-			buildTree(this.treebodycontainer, folderTree);
 		}
 	}
 	
+	// Handles page loading and refreshing
+	function PageOrchestrator(){
+		var alertContainer = document.getElementById("id_alert");
+		var treeContainer = document.getElementById("id_tree");
+		var treeBodyContainer = document.getElementById("id_treebody");
+		
+		this.start = function(){
+			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer);
+			folderTree.show(); // Mostra l'albero delle cartelle
+		};
+		
+		this.refresh = function() { // currentMission initially null at start
+	      alertContainer.textContent = "";        // not null after creation of status change
+	    };
+	}
+}	
