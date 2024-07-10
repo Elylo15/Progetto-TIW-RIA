@@ -24,7 +24,7 @@ ul li::before {
   left: -10px;
 }
 
-body > ul > li:first-child::before {top: 12px;}
+body div > ul > li:first-child::before {top: 12px;}
 
 ul li:not(:first-child):last-child::before {display: none;}
 

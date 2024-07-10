@@ -71,7 +71,7 @@
 				var icon = document.createElement("span");
 				icon.innerHTML = '<img src="img/folder.png">';
 				var folderName = document.createElement("span");
-				folderName.textContent = folder.name;
+				folderName.textContent = " " + folder.name;
 
 				folderContainer.appendChild(icon);
 				folderContainer.appendChild(folderName);
@@ -94,7 +94,7 @@
 						var documentIcon = document.createElement("span");
 						documentIcon.innerHTML = '<img src="img/document.png">';
 						var documentName = document.createElement("span");
-						documentName.textContent = doc.name;
+						documentName.textContent = " " + doc.name;
 
 						documentItem.appendChild(documentIcon);
 						documentItem.appendChild(documentName);
