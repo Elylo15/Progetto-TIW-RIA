@@ -76,6 +76,9 @@
 				folderContainer.appendChild(icon);
 				folderContainer.appendChild(folderName);
 				folderItem.appendChild(folderContainer);
+				
+				//per mettere le cartelle drop
+				self.setUpDroppableFolder(folderItem);
 
 				// Controlla se ci sono sottocartelle
 				if (folder.subFolders.length > 0) {
@@ -83,6 +86,9 @@
 					subfolderList.classList.add("subfolder");
 					self.update(subfolderList, folder.subFolders); // Chiamata ricorsiva per le sottocartelle
 					folderItem.appendChild(subfolderList);
+					
+					//per mettere le cartelle drop
+					self.setUpDroppableFolder(folderItem);
 				}
 
 				// Aggiunge i documenti se presenti
@@ -99,7 +105,8 @@
 						documentItem.appendChild(documentIcon);
 						documentItem.appendChild(documentName);
 						documentsList.appendChild(documentItem);
-						
+
+						//per mettere i documenti draggabili
 						self.setUpDraggableDocs(documentItem);
 					});
 					folderItem.appendChild(documentsList);
@@ -108,8 +115,8 @@
 				parentElement.appendChild(folderItem);
 			});
 		}
-		
-		this.createBin = function(parentElement){
+
+		this.createBin = function(parentElement) {
 			// Generazione del cestino
 			var binItem = document.createElement("li");
 			var binContainer = document.createElement("div");
@@ -124,7 +131,13 @@
 			binContainer.appendChild(icon);
 			binContainer.appendChild(binName);
 			binItem.appendChild(binContainer);
+			
+			//per mettere il cestino drop
+			console.log(self);
+			self.setUpDroppableFolder(binItem);
+			
 			parentElement.appendChild(binItem);
+			
 		}
 
 		this.setUpDraggableDocs = function(docContainer) {
@@ -140,8 +153,41 @@
 				ev.target.classList.remove("dragging");
 			}, false);
 		}
-		
-		
+
+		this.setUpDroppableFolder = function(folderContainer) {
+			folderContainer.setAttribute("droptarget", '');
+			folderContainer.setAttribute("dropzone", '');
+			folderContainer.addEventListener("dragover", (ev) => {
+				//prevent default to allow drop
+				ev.preventDefault();
+			}, false);
+			folderContainer.addEventListener("dragenter", (ev) => {
+				// highligth potential drop target when the draggable element enters it
+				if (ev.target.classList.contains("dropzone")) {
+					ev.target.classList.add("dragover")
+				}
+			});
+
+			folderContainer.addEventListener("dragleave", (ev) => {
+				// reset background of potential drop target when the draggable element leaves it
+				if (ev.target.classList.contains("dropzone")) {
+					ev.target.classList.remove("dragover");
+				}
+			});
+
+			folderContainer.addEventListener("drop", (ev) => {
+				// prevent default action (open as link for some elements)
+				ev.preventDefault();
+				// move dragged element to the selected drop target
+				if (ev.target.classList.contains("dropzone")) {
+					ev.target.classList.remove("dragover");
+					ev.target.appendChild(dragged);
+				}
+			});
+
+		}
+
+
 	}
 
 	// Handles page loading and refreshing
