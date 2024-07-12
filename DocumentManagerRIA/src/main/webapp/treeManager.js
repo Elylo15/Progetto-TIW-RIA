@@ -19,10 +19,11 @@
 	// alert = div che mostra i messaggi di alert
 	// treecontainer = <div id="id_tree"> che include il titolo "Lista delle tue cartelle:"
 	// treebodycontainer = <ul id="id_treebody"> che corrisponde al FolderTree effettivo
-	function FolderTree(_alert, _treecontainer, _treebodycontainer) {
+	function FolderTree(_alert, _treecontainer, _treebodycontainer, _orchestrator) {
 		this.alert = _alert;
 		this.treecontainer = _treecontainer;
 		this.treebodycontainer = _treebodycontainer;
+		this.orchestrator = _orchestrator;
 
 		// Funzione usata per nascondere l albero in assenza di cartelle nell albero
 		this.reset = function() {
@@ -97,6 +98,7 @@
 					documentsList.classList.add("documents");
 					folder.documents.forEach(function(doc) {
 						var documentItem = document.createElement("li");
+						documentItem.classList.add("doc");
 						var documentIcon = document.createElement("span");
 						documentIcon.innerHTML = '<img src="img/document.png">';
 						var documentName = document.createElement("span");
@@ -133,18 +135,17 @@
 			binItem.appendChild(binContainer);
 			
 			//per mettere il cestino drop
-			console.log(self);
-			self.setUpDroppableFolder(binItem);
+			this.setUpDroppableFolder(binItem);
 			
 			parentElement.appendChild(binItem);
-			
 		}
-
+		
+		// I documenti vengono resi draggable per poter essere spostati
 		this.setUpDraggableDocs = function(docContainer) {
 			docContainer.setAttribute("draggable", true);
 			docContainer.addEventListener("dragstart", (ev) => {
 				// store a ref. on the dragged elem
-				dragged = ev.target;
+				var dragged = ev.target;
 				// make it half transparent
 				ev.target.classList.add("dragging");
 			}, false);
@@ -183,10 +184,10 @@
 					ev.target.classList.remove("dragover");
 					ev.target.appendChild(dragged);
 				}
+				console.log("dropped on: " + ev.target);
 			});
 
 		}
-
 
 	}
 
@@ -197,7 +198,7 @@
 		var treeBodyContainer = document.getElementById("id_treebody");
 
 		this.start = function() {
-			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer);
+			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
 			folderTree.show(); // Mostra l'albero delle cartelle
 		};
 
