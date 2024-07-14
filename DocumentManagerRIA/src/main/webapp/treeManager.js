@@ -116,12 +116,14 @@
 
 				parentElement.appendChild(folderItem);
 			});
+			this.treecontainer.style.visibility = "visible";
 		}
 
 		this.createBin = function(parentElement) {
 			// Generazione del cestino
 			var binItem = document.createElement("li");
 			var binContainer = document.createElement("div");
+			binContainer.setAttribute("folderid", "bin");
 			binContainer.classList.add("rootFolder");
 
 			// Aggiunge l'icona del cestino e il nome
@@ -146,6 +148,9 @@
 			docContainer.addEventListener("dragstart", (ev) => {
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("docId", ev.target.getAttribute("documentid"));
+				ev.dataTransfer.setData("fatherFolderId", ev.target.closest("li:not(.doc)").querySelector(".dropzone").getAttribute("folderid"));
+				//.querySelector(".dropzone").getAttribute("folderid"));
+				
 				// make it half transparent
 				ev.target.classList.add("dragging");
 			}, false);
@@ -189,9 +194,52 @@
 				// operazioni di spostamento o eliminazione del documento/file
 				if (dropTarget) {
 					dropTarget.classList.remove("dragover");
-					var doc = ev.dataTransfer.getData("docId");
+					var docId = ev.dataTransfer.getData("docId");
+					var oldFolderId = ev.dataTransfer.getData("fatherFolderId");
+					var destinationFolderId = dropTarget.getAttribute("folderid");
 					// operations
-					console.log(doc + " dropped on: " + dropTarget.getAttribute("folderid"));
+					if(docId!= null || !docId.isNan() ){
+						if (destinationFolderId == "bin") {
+							// eliminazione
+						}
+						else if (oldFolderId == destinationFolderId) {
+							//mostra messaggio di errore
+							this.alert.textContent = "Il documento è già in quella cartella";
+						}
+						else if (oldFolderId != destinationFolderId) {
+							// sposta il documento
+							var self = this;
+							makeCall("GET", 'MoveDocument?fatherFolderId='+destinationFolderId+'&documentId='+docId, null,
+								function(req) {
+									if (req.readyState == XMLHttpRequest.DONE) {
+										var message = req.responseText;
+										switch (req.status) {
+											case 200:
+												self.orchestrator.refresh();
+												break;
+											case 400: // bad request	
+											case 500: // server error
+												self.alert.textContent = message;
+												break;
+										}
+									}
+									else{
+										self.alert.textContent = message;
+									}
+								}
+							);
+									
+						}
+						else{
+							// generico messaggio di errore
+							this.alert.textContent = "Documento non valido";	
+						}
+					}else{
+						// generico messaggio di errore
+						this.alert.textContent = "Documento non valido";
+					}
+					
+					console.log(docId + " dropped on: " + destinationFolderId);
 				}
 			});
 
@@ -211,11 +259,14 @@
 			usrNameContainer.textContent = sessionStorage.getItem('username');
 			
 			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
-			folderTree.show(); // Mostra l'albero delle cartelle
 		};
 
 		this.refresh = function() { // currentMission initially null at start
 			alertContainer.textContent = "";        // not null after creation of status change
+			
+			// restart del folderTree
+			folderTree.reset();
+			folderTree.show();
 		};
 	}
 }	
