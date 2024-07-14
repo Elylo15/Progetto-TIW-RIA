@@ -54,7 +54,8 @@ public class LoadFullTree extends HttpServlet {
 			rootFolders = fDAO.fetchAllTree(u.getUsername());
 		} catch (SQLException e) {
 			//throw new ServletException(e);
-			response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Failure in user's folders database extraction");
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			response.getWriter().println("Failure in user's folders database extraction");
 		}
 		
 		// Convert rootFolders to JSON

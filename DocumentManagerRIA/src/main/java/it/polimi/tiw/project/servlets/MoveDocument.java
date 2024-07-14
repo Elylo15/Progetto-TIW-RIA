@@ -43,14 +43,16 @@ public class MoveDocument extends HttpServlet {
 		String dId = request.getParameter("documentId");
 		Integer documentId; 
 		if(fId == null || dId == null) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parametro non valido");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Parametro non valido");
 			return;
 		}
 		try {
 			folderId = Integer.parseInt(fId);
 			documentId = Integer.parseInt(dId);
 		}catch(NumberFormatException e) {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Parametro con formato non numerico");
+			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+			response.getWriter().println("Parametro con formato non numerico");
 			return;
 		}
 		
@@ -63,7 +65,8 @@ public class MoveDocument extends HttpServlet {
 		        response.setCharacterEncoding("UTF-8");
 		        response.getWriter().write("Lo spostamento ha avuto successo!");
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Lo spostamento è fallito");
+				response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				response.getWriter().println("Lo spostamento è fallito");
 				return;
 			}
 		} catch (SQLException e) {
