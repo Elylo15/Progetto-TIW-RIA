@@ -136,8 +136,99 @@
 			binContainer.appendChild(binName);
 			binItem.appendChild(binContainer);
 
-			//per mettere il cestino drop
-			this.setUpDroppableFolder(binContainer);
+		// GESTIONE DEL DROP PER ELIMINARE UN ELEMENTO
+			// tutti i div di tutte le cartelle sono "dropzone-delete"
+			binContainer.classList.add("dropzone-delete");
+			binContainer.addEventListener("dragover", (ev) => {
+				//prevent default to allow drop
+				ev.preventDefault();
+			}, false);
+
+			binContainer.addEventListener("dragenter", (ev) => {
+				// trovo il div più vicino con classe dropzone-delete
+				const dropTarget = ev.target.closest('.dropzone-delete');
+				// highligth potential drop target when the draggable element enters it
+				if (dropTarget) {
+					dropTarget.classList.add("dragover");
+				}
+			});
+
+			binContainer.addEventListener("dragleave", (ev) => {
+				// trovo il div più vicino con classe dropzone-delete
+				const dropTarget = ev.target.closest('.dropzone-delete');
+				// reset background of potential drop target when the draggable element leaves it
+				if (dropTarget) {
+					dropTarget.classList.remove("dragover");
+				}
+			});
+			
+			
+			// GESTIONE DEL DROP
+			binContainer.addEventListener("drop", (ev) => {
+				// prevent default action (open as link for some elements)
+				ev.preventDefault();
+				// trovo il div più vicino con classe dropzone-delete
+				const dropTarget = ev.target.closest('.dropzone-delete');
+				// operazioni di eliminazione del documento/cartella
+				if (dropTarget) {
+					var self = this;
+					dropTarget.classList.remove("dragover");
+					var folderToDeleteId = ev.dataTransfer.getData("folderToDeleteId");
+					var docToDeleteId = ev.dataTransfer.getData("docId");
+					// CONTROLLO SE HO DROPPATO UN DOCUMENTO O UNA CARTELLA
+					if(docToDeleteId !== "" && !isNaN(docToDeleteId)){
+						// ELIMINAZIONE del DOCUMENTO
+						makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText;
+									switch (req.status) {
+										case 200:
+											self.orchestrator.refresh();
+											break;
+										case 400: // bad request	
+										case 500: // server error
+											self.alert.textContent = message;
+											break;
+									}
+								}
+								else {
+									self.alert.textContent = message;
+								}
+							}
+						);
+					}
+					else if(folderToDeleteId !== "" && !isNan(folderToDeleteId)){
+						// ELIMINAZIONE DELLA CARTELLA
+						makeCall("GET", 'DeleteElement?folderId=' + folderToDeleteId, null,
+							function(req) {
+								if (req.readyState == XMLHttpRequest.DONE) {
+									var message = req.responseText;
+									switch (req.status) {
+										case 200:
+											self.orchestrator.refresh();
+											break;
+										case 400: // bad request	
+										case 500: // server error
+											self.alert.textContent = message;
+											break;
+									}
+								}
+								else {
+									self.alert.textContent = message;
+								}
+							}
+						);
+					} 
+					else{
+						// è stato droppato sul cestino qualcosa di non riconosciuto
+						this.alert.textContent = "Elemento da eleiminare non valido";
+					}
+					
+				}
+			});
+			
+			
 
 			parentElement.appendChild(binItem);
 		}
@@ -191,23 +282,22 @@
 				ev.preventDefault();
 				// trovo il div più vicino con classe dropzone
 				const dropTarget = ev.target.closest('.dropzone');
-				// operazioni di spostamento o eliminazione del documento/file
+				// operazioni di spostamento del documento
 				if (dropTarget) {
 					dropTarget.classList.remove("dragover");
-					var docId = ev.dataTransfer.getData("docId");
-					var oldFolderId = ev.dataTransfer.getData("fatherFolderId");
-					var destinationFolderId = dropTarget.getAttribute("folderid");
-					// operations
-					if(docId!= null || !docId.isNan() ){
-						if (destinationFolderId == "bin") {
-							// eliminazione
-						}
-						else if (oldFolderId == destinationFolderId) {
+					var docId = ev.dataTransfer.getData("docId");	// id del documento da eliminare
+					
+					// OPERATIONS
+					if(docId !== "" && !isNaN(docId)) {
+						// STO DRAGGANDO UN DOCUMENTO
+						var oldFolderId = ev.dataTransfer.getData("fatherFolderId");
+						var destinationFolderId = dropTarget.getAttribute("folderid");
+						if (oldFolderId == destinationFolderId) {
 							//mostra messaggio di errore
 							this.alert.textContent = "Il documento è già in quella cartella";
 						}
 						else if (oldFolderId != destinationFolderId) {
-							// sposta il documento
+							// SPOSTA IL DOCUMENTO
 							var self = this;
 							makeCall("GET", 'MoveDocument?fatherFolderId='+destinationFolderId+'&documentId='+docId, null,
 								function(req) {
@@ -239,7 +329,7 @@
 						this.alert.textContent = "Documento non valido";
 					}
 					
-					console.log(docId + " dropped on: " + destinationFolderId);
+					//console.log(docId + " dropped on: " + destinationFolderId);
 				}
 			});
 

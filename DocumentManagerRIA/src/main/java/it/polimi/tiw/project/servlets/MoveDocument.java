@@ -61,7 +61,7 @@ public class MoveDocument extends HttpServlet {
 		try {
 			if (dDAO.moveDocumentToFolder(documentId, folderId)) {
 				response.setStatus(HttpServletResponse.SC_OK);
-				response.setContentType("application/text");
+				response.setContentType("text/plain");
 		        response.setCharacterEncoding("UTF-8");
 		        response.getWriter().write("Lo spostamento ha avuto successo!");
 			} else {

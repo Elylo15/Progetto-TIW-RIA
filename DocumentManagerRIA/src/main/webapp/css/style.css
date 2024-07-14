@@ -71,6 +71,18 @@ img {
   background-color: #e6e6e6;
 }
 
+.dropzone-delete {
+
+}
+
+.dropzone-delete span {
+    pointer-events: none; /* Questo permette al drop di funzionare anche sopra lo span */
+}
+
+.dropzone-delete.dragover {
+  background-color: #ff0000e6;
+}
+
 .dragging {
   opacity: 0.5;
 }
