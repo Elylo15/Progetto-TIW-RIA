@@ -79,6 +79,11 @@ img {
 	display: none !important;
 }
 
+.alertmessage {
+        color: red;
+        font-size: 18px;
+}
+
 body {
   /* Prevent the user selecting text in the example */
   user-select: none;
