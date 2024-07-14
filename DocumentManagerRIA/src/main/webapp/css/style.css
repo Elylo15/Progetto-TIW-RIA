@@ -60,15 +60,15 @@ img {
 }
 
 .dropzone {
-  width: 200px;
-  height: 20px;
-  background: blueviolet;
-  margin: 10px;
-  padding: 10px;
+
+}
+
+.dropzone span {
+    pointer-events: none; /* Questo permette al drop di funzionare anche sopra lo span */
 }
 
 .dropzone.dragover {
-  background-color: purple;
+  background-color: #e6e6e6;
 }
 
 .dragging {

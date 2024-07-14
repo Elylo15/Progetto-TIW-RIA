@@ -19,6 +19,7 @@
 	// alert = div che mostra i messaggi di alert
 	// treecontainer = <div id="id_tree"> che include il titolo "Lista delle tue cartelle:"
 	// treebodycontainer = <ul id="id_treebody"> che corrisponde al FolderTree effettivo
+	// orchestrator = riferimento al PageOrchestrator per aggiornare la pagina se necessario
 	function FolderTree(_alert, _treecontainer, _treebodycontainer, _orchestrator) {
 		this.alert = _alert;
 		this.treecontainer = _treecontainer;
@@ -66,6 +67,7 @@
 			folders.forEach(function(folder) {
 				var folderItem = document.createElement("li");
 				var folderContainer = document.createElement("div");
+				folderContainer.setAttribute("folderid", folder.id);
 				folderContainer.classList.add("rootFolder");
 
 				// Aggiunge l'icona della cartella e il nome
@@ -77,9 +79,9 @@
 				folderContainer.appendChild(icon);
 				folderContainer.appendChild(folderName);
 				folderItem.appendChild(folderContainer);
-				
+
 				//per mettere le cartelle drop
-				self.setUpDroppableFolder(folderItem);
+				self.setUpDroppableFolder(folderContainer);
 
 				// Controlla se ci sono sottocartelle
 				if (folder.subFolders.length > 0) {
@@ -87,9 +89,6 @@
 					subfolderList.classList.add("subfolder");
 					self.update(subfolderList, folder.subFolders); // Chiamata ricorsiva per le sottocartelle
 					folderItem.appendChild(subfolderList);
-					
-					//per mettere le cartelle drop
-					self.setUpDroppableFolder(folderItem);
 				}
 
 				// Aggiunge i documenti se presenti
@@ -98,6 +97,7 @@
 					documentsList.classList.add("documents");
 					folder.documents.forEach(function(doc) {
 						var documentItem = document.createElement("li");
+						documentItem.setAttribute("documentid", doc.id);
 						documentItem.classList.add("doc");
 						var documentIcon = document.createElement("span");
 						documentIcon.innerHTML = '<img src="img/document.png">';
@@ -133,10 +133,10 @@
 			binContainer.appendChild(icon);
 			binContainer.appendChild(binName);
 			binItem.appendChild(binContainer);
-			
+
 			//per mettere il cestino drop
-			this.setUpDroppableFolder(binItem);
-			
+			this.setUpDroppableFolder(binContainer);
+
 			parentElement.appendChild(binItem);
 		}
 		
@@ -145,7 +145,7 @@
 			docContainer.setAttribute("draggable", true);
 			docContainer.addEventListener("dragstart", (ev) => {
 				// store a ref. on the dragged elem
-				var dragged = ev.target;
+				ev.dataTransfer.setData("docId", ev.target.getAttribute("documentid"));
 				// make it half transparent
 				ev.target.classList.add("dragging");
 			}, false);
@@ -156,35 +156,43 @@
 		}
 
 		this.setUpDroppableFolder = function(folderContainer) {
-			folderContainer.setAttribute("droptarget", '');
-			folderContainer.setAttribute("dropzone", '');
+			// tutti i div di tutte le cartelle sono "dropzone"
+			folderContainer.classList.add("dropzone");
 			folderContainer.addEventListener("dragover", (ev) => {
 				//prevent default to allow drop
 				ev.preventDefault();
 			}, false);
+
 			folderContainer.addEventListener("dragenter", (ev) => {
+				// trovo il div più vicino con classe dropzone
+				const dropTarget = ev.target.closest('.dropzone');
 				// highligth potential drop target when the draggable element enters it
-				if (ev.target.classList.contains("dropzone")) {
-					ev.target.classList.add("dragover")
+				if (dropTarget) {
+					dropTarget.classList.add("dragover");
 				}
 			});
 
 			folderContainer.addEventListener("dragleave", (ev) => {
+				// trovo il div più vicino con classe dropzone
+				const dropTarget = ev.target.closest('.dropzone');
 				// reset background of potential drop target when the draggable element leaves it
-				if (ev.target.classList.contains("dropzone")) {
-					ev.target.classList.remove("dragover");
+				if (dropTarget) {
+					dropTarget.classList.remove("dragover");
 				}
 			});
 
 			folderContainer.addEventListener("drop", (ev) => {
 				// prevent default action (open as link for some elements)
 				ev.preventDefault();
-				// move dragged element to the selected drop target
-				if (ev.target.classList.contains("dropzone")) {
-					ev.target.classList.remove("dragover");
-					ev.target.appendChild(dragged);
+				// trovo il div più vicino con classe dropzone
+				const dropTarget = ev.target.closest('.dropzone');
+				// operazioni di spostamento o eliminazione del documento/file
+				if (dropTarget) {
+					dropTarget.classList.remove("dragover");
+					var doc = ev.dataTransfer.getData("docId");
+					// operations
+					console.log(doc + " dropped on: " + dropTarget.getAttribute("folderid"));
 				}
-				console.log("dropped on: " + ev.target);
 			});
 
 		}
@@ -198,6 +206,10 @@
 		var treeBodyContainer = document.getElementById("id_treebody");
 
 		this.start = function() {
+			// Visualizzazione messaggio di benvenuto personalizzato
+			var usrNameContainer = document.getElementById("id_username");
+			usrNameContainer.textContent = sessionStorage.getItem('username');
+			
 			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
 			folderTree.show(); // Mostra l'albero delle cartelle
 		};
