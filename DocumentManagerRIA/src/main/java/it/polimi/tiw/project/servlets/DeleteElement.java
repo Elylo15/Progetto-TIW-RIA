@@ -34,11 +34,11 @@ public class DeleteElement extends HttpServlet {
 	
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		// check if the user is logged in
-		String loginpath = getServletContext().getContextPath() + "/index.html";
 		User u = null;
 		HttpSession s = request.getSession();
 		if (s.isNew() || s.getAttribute("user") == null) {
-			response.sendRedirect(loginpath);
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Non loggato");
 			return;
 		} else {
 			u = (User) s.getAttribute("user");
