@@ -80,8 +80,12 @@
 				folderContainer.appendChild(folderName);
 				folderItem.appendChild(folderContainer);
 
-				//per mettere le cartelle drop
+				// per consentire di droppare le cartelle
 				self.setUpDroppableFolder(folderContainer);
+				// per consentire di draggare le cartelle
+				self.setUpDraggableFolder(folderContainer);
+				
+				
 
 				// Controlla se ci sono sottocartelle
 				if (folder.subFolders.length > 0) {
@@ -198,7 +202,7 @@
 							}
 						);
 					}
-					else if(folderToDeleteId !== "" && !isNan(folderToDeleteId)){
+					else if(folderToDeleteId !== "" && !isNaN(folderToDeleteId)){
 						// ELIMINAZIONE DELLA CARTELLA
 						makeCall("GET", 'DeleteElement?folderId=' + folderToDeleteId, null,
 							function(req) {
@@ -227,9 +231,6 @@
 					
 				}
 			});
-			
-			
-
 			parentElement.appendChild(binItem);
 		}
 		
@@ -240,7 +241,6 @@
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("docId", ev.target.getAttribute("documentid"));
 				ev.dataTransfer.setData("fatherFolderId", ev.target.closest("li:not(.doc)").querySelector(".dropzone").getAttribute("folderid"));
-				//.querySelector(".dropzone").getAttribute("folderid"));
 				
 				// make it half transparent
 				ev.target.classList.add("dragging");
@@ -250,7 +250,8 @@
 				ev.target.classList.remove("dragging");
 			}, false);
 		}
-
+		
+		// Le cartelle sono resi "droppable" per fare in modo che un documento possa spostarsi su di esse
 		this.setUpDroppableFolder = function(folderContainer) {
 			// tutti i div di tutte le cartelle sono "dropzone"
 			folderContainer.classList.add("dropzone");
@@ -333,6 +334,22 @@
 				}
 			});
 
+		}
+		
+		// TODO: fare le cartelle draggable in modo che siano eliminabili
+		this.setUpDraggableFolder = function(folderContainer) {
+			folderContainer.setAttribute("draggable", true);
+			folderContainer.addEventListener("dragstart", (ev) => {
+				// store a ref. on the dragged elem
+				ev.dataTransfer.setData("folderToDeleteId", ev.target.getAttribute("folderid"));
+				
+				// make it half transparent
+				ev.target.classList.add("dragging");
+			}, false);
+			folderContainer.addEventListener("dragend", (ev) => {
+				// reset the transparency
+				ev.target.classList.remove("dragging");
+			}, false);
 		}
 
 	}
