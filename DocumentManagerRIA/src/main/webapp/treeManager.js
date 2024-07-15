@@ -382,7 +382,9 @@
 		this.formContainer = _formContainer;
 		this.alert = _alert;
 
-
+		this.reset = function(){
+			this.formContainer.style.visibility = "hidden";
+		}
 		this.show = function() {
 			var self = this;
 			this.formContainer.style.visibility = "visible";
@@ -454,6 +456,7 @@
 			// restart del folderTree
 			folderTree.reset();
 			folderTree.show();
+			createFolderForm.reset();
 		};
 	}
 }	
