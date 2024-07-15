@@ -88,8 +88,8 @@
 				self.setUpDroppableFolder(folderContainer);
 				// per consentire di draggare le cartelle
 				self.setUpDraggableFolder(folderContainer);
-				
-				
+
+
 
 				// Controlla se ci sono sottocartelle
 				if (folder.subFolders.length > 0) {
@@ -144,7 +144,7 @@
 			binContainer.appendChild(binName);
 			binItem.appendChild(binContainer);
 
-		// GESTIONE DEL DROP PER ELIMINARE UN ELEMENTO
+			// GESTIONE DEL DROP PER ELIMINARE UN ELEMENTO
 			// tutti i div di tutte le cartelle sono "dropzone-delete"
 			binContainer.classList.add("dropzone-delete");
 			binContainer.addEventListener("dragover", (ev) => {
@@ -169,8 +169,8 @@
 					dropTarget.classList.remove("dragover");
 				}
 			});
-			
-			
+
+
 			// GESTIONE DEL DROP
 			binContainer.addEventListener("drop", (ev) => {
 				// prevent default action (open as link for some elements)
@@ -184,7 +184,7 @@
 					var folderToDeleteId = ev.dataTransfer.getData("folderToDeleteId");
 					var docToDeleteId = ev.dataTransfer.getData("docId");
 					// CONTROLLO SE HO DROPPATO UN DOCUMENTO O UNA CARTELLA
-					if(docToDeleteId !== "" && !isNaN(docToDeleteId)){
+					if (docToDeleteId !== "" && !isNaN(docToDeleteId)) {
 						// ELIMINAZIONE del DOCUMENTO
 						makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
 							function(req) {
@@ -206,7 +206,7 @@
 							}
 						);
 					}
-					else if(folderToDeleteId !== "" && !isNaN(folderToDeleteId)){
+					else if (folderToDeleteId !== "" && !isNaN(folderToDeleteId)) {
 						// ELIMINAZIONE DELLA CARTELLA
 						makeCall("GET", 'DeleteElement?folderId=' + folderToDeleteId, null,
 							function(req) {
@@ -227,17 +227,17 @@
 								}
 							}
 						);
-					} 
-					else{
+					}
+					else {
 						// è stato droppato sul cestino qualcosa di non riconosciuto
 						this.alert.textContent = "Elemento da eleiminare non valido";
 					}
-					
+
 				}
 			});
 			parentElement.appendChild(binItem);
 		}
-		
+
 		// I documenti vengono resi draggable per poter essere spostati
 		this.setUpDraggableDocs = function(docContainer) {
 			docContainer.setAttribute("draggable", true);
@@ -245,7 +245,7 @@
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("docId", ev.target.getAttribute("documentid"));
 				ev.dataTransfer.setData("fatherFolderId", ev.target.closest("li:not(.doc)").querySelector(".dropzone").getAttribute("folderid"));
-				
+
 				// make it half transparent
 				ev.target.classList.add("dragging");
 			}, false);
@@ -254,7 +254,7 @@
 				ev.target.classList.remove("dragging");
 			}, false);
 		}
-		
+
 		// Le cartelle sono resi "droppable" per fare in modo che un documento possa spostarsi su di esse
 		this.setUpDroppableFolder = function(folderContainer) {
 			// tutti i div di tutte le cartelle sono "dropzone"
@@ -291,9 +291,9 @@
 				if (dropTarget) {
 					dropTarget.classList.remove("dragover");
 					var docId = ev.dataTransfer.getData("docId");	// id del documento da eliminare
-					
+
 					// OPERATIONS
-					if(docId !== "" && !isNaN(docId)) {
+					if (docId !== "" && !isNaN(docId)) {
 						// STO DRAGGANDO UN DOCUMENTO
 						var oldFolderId = ev.dataTransfer.getData("fatherFolderId");
 						var destinationFolderId = dropTarget.getAttribute("folderid");
@@ -304,7 +304,7 @@
 						else if (oldFolderId != destinationFolderId) {
 							// SPOSTA IL DOCUMENTO
 							var self = this;
-							makeCall("GET", 'MoveDocument?fatherFolderId='+destinationFolderId+'&documentId='+docId, null,
+							makeCall("GET", 'MoveDocument?fatherFolderId=' + destinationFolderId + '&documentId=' + docId, null,
 								function(req) {
 									if (req.readyState == XMLHttpRequest.DONE) {
 										var message = req.responseText;
@@ -318,35 +318,35 @@
 												break;
 										}
 									}
-									else{
+									else {
 										self.alert.textContent = message;
 									}
 								}
 							);
-									
+
 						}
-						else{
+						else {
 							// generico messaggio di errore
-							this.alert.textContent = "Documento non valido";	
+							this.alert.textContent = "Documento non valido";
 						}
-					}else{
+					} else {
 						// generico messaggio di errore
 						this.alert.textContent = "Documento non valido";
 					}
-					
+
 					//console.log(docId + " dropped on: " + destinationFolderId);
 				}
 			});
 
 		}
-		
+
 		// TODO: fare le cartelle draggable in modo che siano eliminabili
 		this.setUpDraggableFolder = function(folderContainer) {
 			folderContainer.setAttribute("draggable", true);
 			folderContainer.addEventListener("dragstart", (ev) => {
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("folderToDeleteId", ev.target.getAttribute("folderid"));
-				
+
 				// make it half transparent
 				ev.target.classList.add("dragging");
 			}, false);
@@ -355,7 +355,7 @@
 				ev.target.classList.remove("dragging");
 			}, false);
 		}
-		
+
 		// Aggiungi i bottoni per le sottocartelle
 		this.addButtons = function(folderContainer) {
 			// Bottone per aggiungere una sottocartella
@@ -374,46 +374,51 @@
 
 
 
-	function CreateFolderForm(_orchestrator,_alert, _formContainer) {
+	function CreateFolderForm(_orchestrator, _alert, _formContainer) {
 		this.orchestrator = _orchestrator;
 		this.formContainer = _formContainer;
 		this.alert = _alert;
-		
+
 
 		this.show = function() {
 			var self = this;
 			this.formContainer.style.visibility = "visible";
 			var createFolderForm = document.getElementById("createFolder_form");
-
+			var fatherFolderId = this.formContainer.getAttribute("fatherfolderid");
+			var input = document.createElement("input");
+			input.type = "hidden";
+			input.name = "fatherFolderid";
+			input.value = fatherFolderId;
+			createFolderForm.appendChild(input);
 			// Aggiungi un event listener per l'evento submit
 			createFolderForm.addEventListener('submit', function(e) {
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
 
 				makeCall("POST", "CreateFolder", createFolderForm, function(req) {
 
-						if (req.readyState == XMLHttpRequest.DONE) {
-							var message = req.responseText;
-							switch (req.status) {
-								case 200:
-									self.orchestrator.refresh();
-									break;
-								case 400: // bad request	
-								case 500: // server error
-									self.alert.textContent = message;
-									break;
-							}
+					if (req.readyState == XMLHttpRequest.DONE) {
+						var message = req.responseText;
+						switch (req.status) {
+							case 200:
+								self.orchestrator.refresh();
+								break;
+							case 400: // bad request	
+							case 500: // server error
+								self.alert.textContent = message;
+								break;
 						}
-						else {
-							self.alert.textContent = message;
-						}
-					});
+					}
+					else {
+						self.alert.textContent = message;
+					}
 				});
-
-			}
+			});
 
 		}
 
-	
+	}
+
+
 
 
 
@@ -432,9 +437,9 @@
 			usrNameContainer.textContent = sessionStorage.getItem('username');
 
 			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
-			
+
 			//Creazione dell'oggetto createFolderForm
-			createFolderForm = new CreateFolderForm(this,alertContainer, formContainer);
+			createFolderForm = new CreateFolderForm(this, alertContainer, formContainer);
 		};
 
 		this.refresh = function() { // currentMission initially null at start
