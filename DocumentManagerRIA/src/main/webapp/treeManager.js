@@ -8,7 +8,6 @@
 			window.location.href = "index.html";
 		} else {
 			// displayFolderTree();
-			console.log("dio");
 			pageOrchestrator.start(); // initialize the components
 			pageOrchestrator.refresh();
 		} // display initial content
