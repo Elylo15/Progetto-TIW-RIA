@@ -384,6 +384,7 @@
 
 		this.reset = function(){
 			this.formContainer.style.visibility = "hidden";
+			//fare pulizia dei paramentri
 		}
 		this.show = function() {
 			var self = this;
