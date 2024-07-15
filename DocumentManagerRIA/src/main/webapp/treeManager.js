@@ -1,6 +1,6 @@
 {
 	// Page components
-	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator();
+	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator(), createFolderForm;
 
 	// on HomePageRia.html load function
 	window.addEventListener("load", () => {
@@ -8,6 +8,7 @@
 			window.location.href = "index.html";
 		} else {
 			// displayFolderTree();
+			console.log("dio");
 			pageOrchestrator.start(); // initialize the components
 			pageOrchestrator.refresh();
 		} // display initial content
@@ -80,7 +81,11 @@
 				folderContainer.appendChild(folderName);
 				folderItem.appendChild(folderContainer);
 
-				// per consentire di droppare le cartelle
+				//aggiunta dei bottoni per aggiungere sottocartelle
+				self.addButtons(folderContainer, folder.id, folders);
+
+
+				//per mettere le cartelle drop
 				self.setUpDroppableFolder(folderContainer);
 				// per consentire di draggare le cartelle
 				self.setUpDraggableFolder(folderContainer);
@@ -351,26 +356,91 @@
 				ev.target.classList.remove("dragging");
 			}, false);
 		}
+		
+		// Aggiungi i bottoni per le sottocartelle
+		this.addButtons = function(folderContainer) {
+			// Bottone per aggiungere una sottocartella
+			var addSubfolderButton = document.createElement("button");
+			addSubfolderButton.textContent = "Aggiungi Sottocartella";
+			addSubfolderButton.addEventListener("click", function() {
+				document.getElementById("fatherFolder").textContent = folderContainer.children[1].textContent;
+				document.getElementById("div_createFolder").setAttribute("fatherFolderId", folderContainer.getAttribute("folderid"));
+				createFolderForm.show();
+			});
+
+			folderContainer.appendChild(addSubfolderButton);
+		}
 
 	}
+
+
+
+	function CreateFolderForm(_orchestrator,_alert, _formContainer) {
+		this.orchestrator = _orchestrator;
+		this.formContainer = _formContainer;
+		this.alert = _alert;
+		
+
+		this.show = function() {
+			var self = this;
+			this.formContainer.style.visibility = "visible";
+			var createFolderForm = document.getElementById("createFolder_form");
+
+			// Aggiungi un event listener per l'evento submit
+			createFolderForm.addEventListener('submit', function(e) {
+				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
+
+				makeCall("POST", "CreateFolder", createFolderForm, function(req) {
+
+						if (req.readyState == XMLHttpRequest.DONE) {
+							var message = req.responseText;
+							switch (req.status) {
+								case 200:
+									self.orchestrator.refresh();
+									break;
+								case 400: // bad request	
+								case 500: // server error
+									self.alert.textContent = message;
+									break;
+							}
+						}
+						else {
+							self.alert.textContent = message;
+						}
+					});
+				});
+
+			}
+
+		}
+
+	
+
+
+
+
 
 	// Handles page loading and refreshing
 	function PageOrchestrator() {
 		var alertContainer = document.getElementById("id_alert");
 		var treeContainer = document.getElementById("id_tree");
 		var treeBodyContainer = document.getElementById("id_treebody");
+		var formContainer = document.getElementById("div_createFolder");
 
 		this.start = function() {
 			// Visualizzazione messaggio di benvenuto personalizzato
 			var usrNameContainer = document.getElementById("id_username");
 			usrNameContainer.textContent = sessionStorage.getItem('username');
-			
+
 			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
+			
+			//Creazione dell'oggetto createFolderForm
+			createFolderForm = new CreateFolderForm(this,alertContainer, formContainer);
 		};
 
 		this.refresh = function() { // currentMission initially null at start
 			alertContainer.textContent = "";        // not null after creation of status change
-			
+
 			// restart del folderTree
 			folderTree.reset();
 			folderTree.show();

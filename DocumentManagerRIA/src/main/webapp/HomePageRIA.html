@@ -18,50 +18,49 @@
 	<div id="id_tree">
 		<h2>Lista delle tue cartelle:</h2>
 		<ul id="id_treebody">
-			<!--<li id="rootfolder1Tree">
-				 <div>
-					<div id="rootfolder1" class="rootFolder">da rendere draggable
-						<span><img src="img/folder.png"></span>
-            			<span id="rootfolder_name"></span>
-					</div>
-					
-					 Per le cartelle figlio
-			        <ul id="subfolders" class="subfolder">
-			            <li id="subfolder1">
-			                <span><img src="img/folder.png"></span>
-			                <span id="subfolder_name"></span> 
-			        		
-			        		Per le cartelle figlio-figlio
-			        		<div>
-			        			<ul id="subsubfolders" class="subfolder">
-			        				<li id="subfolder1">
-			                		<span><img src="img/folder.png"></span>
-			                		
-			                	 ulteriori sotto-sotto-sotto cartelle 
-			        			</ul>
-			        			
-			        			<ul id="documents" class="documents">
-						            <li id="document1">
-						                <span><img src="img/document.png"></span>
-						                <span id="document_name"></span>
-						            </li>
-						        </ul>
-			        		</div>        
-			                
-			            </li>
-			        </ul>
-			        
-			        Per i documenti nella cartella corrente 
-			        <ul id="documents" class="documents">
-			            <li id="document1">
-			                <span><img src="img/document.png"></span>
-			                <span id="document_name"></span>
-			            </li>
-			        </ul>
-			        
-				</div>
-			</li>-->
+			
 		</ul>
+	</div>
+	<!-- Form per creare le sottocartelle -->
+	<div class="formdiv" id="div_createFolder">
+		<p>Crea cartella/sottocartella</p>
+		<form id="createFolder_form" method="POST">
+			<fieldset>
+				<p>
+					<span id="fatherFolder"></span>
+				</p>
+				<p>
+					Nome da dare : <input type="text" name="folderName" required/>
+				</p>
+				<input type="submit" name="Crea cartella">
+			</fieldset>
+		</form>
+	</div>
+	<!-- Form per creare documenti -->
+	<div class="formdiv" id="div_createDocument">
+		<p>Crea Documento</p>
+		<form id="createDocument_form" method="POST">
+			<fieldset>
+				<p>
+					<label for="folderId">Sceglie cartella in cui vuoi mettere il documento:</label>
+					<select name="folderId" id="folderId">
+						<!--  aggiunte dinamenete -->
+					</select>
+				</p>
+				<p>
+					Nome da dare : <input type="text" name="documentName" requires/>
+				</p>
+				<p>
+					<label>Sceglie il tipo di documento:</label>
+					<select name="type" id="type">
+						<option value="text">Text</option>
+						<option value="image">Image</option>
+						<option value="video">Video</option>
+					</select>
+				</p>
+				<input type="submit" name="Crea documento">
+			</fieldset>
+		</form>
 	</div>
 </body>
 </html>
