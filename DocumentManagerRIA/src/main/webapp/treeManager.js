@@ -185,6 +185,7 @@
 					var docToDeleteId = ev.dataTransfer.getData("docId");
 					// CONTROLLO SE HO DROPPATO UN DOCUMENTO O UNA CARTELLA
 					if (docToDeleteId !== "" && !isNaN(docToDeleteId)) {
+						
 						// ELIMINAZIONE del DOCUMENTO
 						makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
 							function(req) {
@@ -340,7 +341,7 @@
 
 		}
 
-		// TODO: fare le cartelle draggable in modo che siano eliminabili
+		// Le cartelle sono rese draggable in modo che siano eliminabili
 		this.setUpDraggableFolder = function(folderContainer) {
 			folderContainer.setAttribute("draggable", true);
 			folderContainer.addEventListener("dragstart", (ev) => {
@@ -373,7 +374,9 @@
 	}
 
 
-
+	// alert = div che mostra i messaggi di alert
+	// formContainer = <div id="div_createFolder"> 
+	// orchestrator = riferimento al PageOrchestrator per aggiornare la pagina se necessario
 	function CreateFolderForm(_orchestrator, _alert, _formContainer) {
 		this.orchestrator = _orchestrator;
 		this.formContainer = _formContainer;
@@ -418,15 +421,18 @@
 
 	}
 
-
-
+	// finestra modale di conferma quando cerco di modificare un documento
+	function AlertContainer(){
+		this.show = function(){
+		}
+	}
 
 
 
 
 	// Handles page loading and refreshing
 	function PageOrchestrator() {
-		var alertContainer = document.getElementById("id_alert");
+		var alert = document.getElementById("id_alert");
 		var treeContainer = document.getElementById("id_tree");
 		var treeBodyContainer = document.getElementById("id_treebody");
 		var formContainer = document.getElementById("div_createFolder");
@@ -436,14 +442,14 @@
 			var usrNameContainer = document.getElementById("id_username");
 			usrNameContainer.textContent = sessionStorage.getItem('username');
 
-			folderTree = new FolderTree(alertContainer, treeContainer, treeBodyContainer, this);
+			folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
 
 			//Creazione dell'oggetto createFolderForm
-			createFolderForm = new CreateFolderForm(this, alertContainer, formContainer);
+			createFolderForm = new CreateFolderForm(this, alert, formContainer);
 		};
 
 		this.refresh = function() { // currentMission initially null at start
-			alertContainer.textContent = "";        // not null after creation of status change
+			alert.textContent = "";        // not null after creation of status change
 
 			// restart del folderTree
 			folderTree.reset();
