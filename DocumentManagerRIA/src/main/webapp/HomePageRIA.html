@@ -10,62 +10,97 @@
 <script src="treeManager.js" charset="utf-8" defer></script>
 </head>
 <body>
-	<h1>Benvenuto <span id="id_username"></span>in DocumentManager!</h1>
+	<h1>
+		Benvenuto <span id="id_username"></span>in DocumentManager!
+	</h1>
 	<div align="right">
 		<a href="Logout">Logout</a>
 	</div>
 	<div id="id_alert" class="alertmessage"></div>
-	<div id="id_tree">
-		<h2>Lista delle tue cartelle:</h2>
-		<input type="button" id="addRootFolderButton" value="Aggiungi Cartella Padre">
-		<ul id="id_treebody">
-			
-		</ul>
-	</div>
-	<!-- Form per creare le sottocartelle -->
-	<div class="formdiv" id="div_createFolder">
-		<p>Crea cartella/sottocartella</p>
-		<form id="createFolder_form" method="POST">
-			<fieldset>
-				<p>
-					<span id="fatherFolder"></span>
-				</p>
-				<p>
-					Nome da dare : <input type="text" name="folderName" required/>
-				</p>
-				<input type="submit" name="Crea cartella">
-			</fieldset>
-		</form>
-	</div>
-	<!-- Form per creare documenti -->
-	<div class="formdiv" id="div_createDocument">
-		<p>Crea Documento</p>
-		<form id="createDocument_form" method="POST">
-			<fieldset>
-				<p>
-					Nome della cartella padre: <span id="fatherFolderDocument"></span>
-				</p>
-				<p>
-					Nome da dare : <input type="text" name="documentName" required/>
-				</p>
-				<p>
-					<label>Sceglie il tipo di documento:</label>
-					<select name="type" id="type">
-						<option value="text">Text</option>
-						<option value="image">Image</option>
-						<option value="video">Video</option>
-					</select>
-				</p>
-				<input type="submit" name="Crea documento">
-			</fieldset>
-		</form>
-	</div>
-	
+	<table>
+		<tbody>
+			<tr>
+				<td>
+					<!-- FolderTree -->
+					<div id="id_tree">
+						<h2>Lista delle tue cartelle:</h2>
+						<input type="button" id="addRootFolderButton"
+							value="Aggiungi Cartella Padre">
+						<ul id="id_treebody">
+						</ul>
+					</div>
+				</td>
+				<td>
+					<!-- DocumentInfo -->
+					<div id="div_documentInfo">
+						<h2>
+							Pagina dettagli del documento <span id="docName"></span>
+						</h2> 
+						Nome: <span id="documentName"></span>
+						<br> 
+						Proprietario: <span id="documentOwner"></span>
+						<br>
+						Data di creazione: <span id="documentDate"></span>
+						<br> 
+						Tipo: <span id="documentType"></span>
+						<br>
+						Digest: <span id="documentDigest"></span>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<!-- Form per creare le sottocartelle -->
+					<div class="formdiv" id="div_createFolder">
+						<p>Crea cartella/sottocartella</p>
+						<form id="createFolder_form" method="POST">
+							<fieldset>
+								<p>
+									Nome della cartella padre: <span id="fatherFolder"></span>
+								</p>
+								<p>
+									Nome da dare : <input type="text" name="folderName" required />
+								</p>
+								<input type="submit" name="Crea cartella">
+							</fieldset>
+						</form>
+					</div>
+				</td>
+				<td>
+					<!-- Form per creare documenti -->
+					<div class="formdiv" id="div_createDocument">
+						<p>Crea Documento</p>
+						<form id="createDocument_form" method="POST">
+							<fieldset>
+								<p>
+									Nome della cartella padre: <span id="fatherFolderDocument"></span>
+								</p>
+								<p>
+									Nome da dare : <input type="text" name="documentName" required />
+								</p>
+								<p>
+									<label>Sceglie il tipo di documento:</label> <select name="type"
+										id="type">
+										<option value="text">Text</option>
+										<option value="image">Image</option>
+										<option value="video">Video</option>
+									</select>
+								</p>
+								<input type="submit" name="Crea documento">
+							</fieldset>
+						</form>
+					</div>
+				</td>
+			</tr>
+		</tbody>
+	</table>
 	<!-- Finestra Modale -->
 	<div id="modal" class="modal">
 		<div class="modal-content">
 			<span class="close-btn">&times;</span>
-			<p>Sei sicuro di voler eliminare <span id="elementToDelete"></span> ?</p>
+			<p>
+				Sei sicuro di voler eliminare <span id="elementToDelete"></span>?
+			</p>
 			<button id="confirmBtn">Conferma</button>
 			<button id="cancelBtn">Annulla</button>
 		</div>

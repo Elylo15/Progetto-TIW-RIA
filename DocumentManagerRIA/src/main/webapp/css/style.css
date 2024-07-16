@@ -14,6 +14,13 @@ div#div_createDocument{
 	visibility: hidden;
 }
 
+div#div_documentInfo{
+	visibility: hidden;
+	border: 1px solid black;
+	padding: 0 10px 10px 10px;
+	margin-left: 20px;
+}
+
 * {list-style: none;}
 
 ul li {
