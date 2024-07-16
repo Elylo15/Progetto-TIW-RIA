@@ -45,9 +45,10 @@
 								self.alert.textContent = "Non ci sono cartelle o documenti da mostrare!";
 								return;
 							}
+							
 							self.update(self.treebodycontainer, treeToShow); // self visible by closure
 							self.createBin(self.treebodycontainer);
-
+							self.addRootFolderButton(self.treecontainer);
 						} else if (req.status == 403) {
 							// Utente non autorizzato, lo slogga
 							window.location.href = req.getResponseHeader("Location");
@@ -81,7 +82,7 @@
 				folderItem.appendChild(folderContainer);
 
 				//aggiunta dei bottoni per aggiungere sottocartelle
-				self.addButtons(folderContainer, folder.id, folders);
+				self.addButtonsSubFolder(folderContainer);
 
 
 				//per mettere le cartelle drop
@@ -358,7 +359,7 @@
 		}
 
 		// Aggiungi i bottoni per le sottocartelle
-		this.addButtons = function(folderContainer) {
+		this.addButtonsSubFolder = function(folderContainer) {
 			// Bottone per aggiungere una sottocartella
 			var addSubfolderButton = document.createElement("button");
 			addSubfolderButton.textContent = "Aggiungi Sottocartella";
@@ -369,6 +370,20 @@
 			});
 
 			folderContainer.appendChild(addSubfolderButton);
+		}
+
+		this.addRootFolderButton = function(parentElement) {
+			//Aggiungi bottone per crea cartella padre
+			var addRootFolderButton = document.createElement("button");
+			addRootFolderButton.textContent = "Aggiungi Cartella Padre";
+			addRootFolderButton.addEventListener("click", function() {
+				// Mostra il form per creare una nuova cartella padre
+				document.getElementById("fatherFolder").textContent = "Folder0";
+				document.getElementById("div_createFolder").setAttribute("fatherFolderId", "0");
+				createFolderForm.show();
+			});
+			parentElement.appendChild(addRootFolderButton);
+
 		}
 
 	}
@@ -387,8 +402,8 @@
 			// fare pulizia dei parametri, rimuoviamo l'input hidden se presente
 			var hiddenInput = document.querySelector('input[name="fatherFolderid"]');
 			if (hiddenInput && hiddenInput.parentElement === this.formContainer) {
-            	this.formContainer.removeChild(hiddenInput);
-        	}
+				this.formContainer.removeChild(hiddenInput);
+			}
 		}
 		this.show = function() {
 			var self = this;
@@ -432,44 +447,44 @@
 					self.reset();
 				});
 			}, { once: true }); // Usa { once: true } per rimuovere l'event listener dopo la prima esecuzione
+		}
+
 	}
 
-}
-
-// finestra modale di conferma quando cerco di modificare un documento
-function AlertContainer() {
-	this.show = function() {
+	// finestra modale di conferma quando cerco di modificare un documento
+	function AlertContainer() {
+		this.show = function() {
+		}
 	}
-}
 
 
 
 
-// Handles page loading and refreshing
-function PageOrchestrator() {
-	var alert = document.getElementById("id_alert");
-	var treeContainer = document.getElementById("id_tree");
-	var treeBodyContainer = document.getElementById("id_treebody");
-	var formContainer = document.getElementById("div_createFolder");
+	// Handles page loading and refreshing
+	function PageOrchestrator() {
+		var alert = document.getElementById("id_alert");
+		var treeContainer = document.getElementById("id_tree");
+		var treeBodyContainer = document.getElementById("id_treebody");
+		var formContainer = document.getElementById("div_createFolder");
 
-	this.start = function() {
-		// Visualizzazione messaggio di benvenuto personalizzato
-		var usrNameContainer = document.getElementById("id_username");
-		usrNameContainer.textContent = sessionStorage.getItem('username');
+		this.start = function() {
+			// Visualizzazione messaggio di benvenuto personalizzato
+			var usrNameContainer = document.getElementById("id_username");
+			usrNameContainer.textContent = sessionStorage.getItem('username');
 
-		folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
+			folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
 
-		//Creazione dell'oggetto createFolderForm
-		createFolderForm = new CreateFolderForm(this, alert, formContainer);
-	};
+			//Creazione dell'oggetto createFolderForm
+			createFolderForm = new CreateFolderForm(this, alert, formContainer);
+		};
 
-	this.refresh = function() { // currentMission initially null at start
-		alert.textContent = "";        // not null after creation of status change
+		this.refresh = function() { // currentMission initially null at start
+			alert.textContent = "";        // not null after creation of status change
 
-		// restart del folderTree
-		folderTree.reset();
-		folderTree.show();
-		createFolderForm.reset();
-	};
-}
+			// restart del folderTree
+			folderTree.reset();
+			folderTree.show();
+			createFolderForm.reset();
+		};
+	}
 }	
