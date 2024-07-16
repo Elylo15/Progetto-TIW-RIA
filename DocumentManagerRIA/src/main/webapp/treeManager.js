@@ -1,6 +1,6 @@
 {
 	// Page components
-	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator(), createFolderForm, createDocumentForm;
+	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator(), createFolderForm, createDocumentForm, alertContainer;
 
 	// on HomePageRia.html load function
 	window.addEventListener("load", () => {
@@ -45,10 +45,11 @@
 								self.alert.textContent = "Non ci sono cartelle o documenti da mostrare!";
 								return;
 							}
-							
+
 							self.update(self.treebodycontainer, treeToShow); // self visible by closure
 							self.createBin(self.treebodycontainer);
-							self.rootFolderButtonOnClick(document.getElementById("addRootFolderButton"));
+							self.addRootFolderButton(document.getElementById("addRootFolderButton"));
+							
 						} else if (req.status == 403) {
 							// Utente non autorizzato, lo slogga
 							window.location.href = req.getResponseHeader("Location");
@@ -83,7 +84,7 @@
 
 				//aggiunta dei bottoni per aggiungere sottocartelle
 				self.addButtonsSubFolder(folderContainer);
-				
+
 				//aggiunta dei bottoni per aggingere documenti
 				self.addDocumentButton(folderContainer);
 
@@ -189,49 +190,14 @@
 					var docToDeleteId = ev.dataTransfer.getData("docId");
 					// CONTROLLO SE HO DROPPATO UN DOCUMENTO O UNA CARTELLA
 					if (docToDeleteId !== "" && !isNaN(docToDeleteId)) {
-
-						// ELIMINAZIONE del DOCUMENTO
-						makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
-							function(req) {
-								if (req.readyState == XMLHttpRequest.DONE) {
-									var message = req.responseText;
-									switch (req.status) {
-										case 200:
-											self.orchestrator.refresh();
-											break;
-										case 400: // bad request	
-										case 500: // server error
-											self.alert.textContent = message;
-											break;
-									}
-								}
-								else {
-									self.alert.textContent = message;
-								}
-							}
-						);
+						// mostro la finestra modale di conferma per ELIMINARE il DOCUMENTO
+						var docToBeDeletedName = ev.dataTransfer.getData("docName");
+						alertContainer.show(docToDeleteId, docToBeDeletedName, true);
 					}
 					else if (folderToDeleteId !== "" && !isNaN(folderToDeleteId)) {
-						// ELIMINAZIONE DELLA CARTELLA
-						makeCall("GET", 'DeleteElement?folderId=' + folderToDeleteId, null,
-							function(req) {
-								if (req.readyState == XMLHttpRequest.DONE) {
-									var message = req.responseText;
-									switch (req.status) {
-										case 200:
-											self.orchestrator.refresh();
-											break;
-										case 400: // bad request	
-										case 500: // server error
-											self.alert.textContent = message;
-											break;
-									}
-								}
-								else {
-									self.alert.textContent = message;
-								}
-							}
-						);
+						// mostro la finestra modale di conferma per ELIMINARE la CARTELLA
+						var folderToBeDeletedName = ev.dataTransfer.getData("folderName");
+						alertContainer.show(folderToDeleteId, folderToBeDeletedName, false);
 					}
 					else {
 						// è stato droppato sul cestino qualcosa di non riconosciuto
@@ -250,6 +216,7 @@
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("docId", ev.target.getAttribute("documentid"));
 				ev.dataTransfer.setData("fatherFolderId", ev.target.closest("li:not(.doc)").querySelector(".dropzone").getAttribute("folderid"));
+				ev.dataTransfer.setData("docName", ev.target.querySelectorAll("span")[1].textContent);
 
 				// make it half transparent
 				ev.target.classList.add("dragging");
@@ -351,6 +318,7 @@
 			folderContainer.addEventListener("dragstart", (ev) => {
 				// store a ref. on the dragged elem
 				ev.dataTransfer.setData("folderToDeleteId", ev.target.getAttribute("folderid"));
+				ev.dataTransfer.setData("folderName", ev.target.querySelectorAll("span")[1].textContent);
 
 				// make it half transparent
 				ev.target.classList.add("dragging");
@@ -375,7 +343,7 @@
 			folderContainer.appendChild(addSubfolderButton);
 		}
 
-		this.rootFolderButtonOnClick = function(addRootFolderButton) {
+		this.addRootFolderButton = function(addRootFolderButton) {
 			addRootFolderButton.addEventListener("click", function() {
 				// Mostra il form per creare una nuova cartella padre
 				document.getElementById("fatherFolder").textContent = "Folder0";
@@ -383,19 +351,18 @@
 				createFolderForm.show();
 			});
 		}
-		
+
 		this.addDocumentButton = function(folderContainer) {
 			//Aggiungi bottone per crea cartella padre
-			var addRootFolderButton = document.createElement("button");
-			addRootFolderButton.textContent = "Aggiungi Documento";
-			addRootFolderButton.addEventListener("click", function() {
+			var addDocumentButton = document.createElement("button");
+			addDocumentButton.textContent = "Aggiungi Documento";
+			addDocumentButton.addEventListener("click", function() {
 				// Mostra il form per creare una nuova cartella padre
 				document.getElementById("fatherFolderDocument").textContent = folderContainer.children[1].textContent;
 				document.getElementById("div_createDocument").setAttribute("fatherFolderId", folderContainer.getAttribute("folderid"));
 				createDocumentForm.show();
 			});
-			folderContainer.appendChild(addRootFolderButton);
-
+			folderContainer.appendChild(addDocumentButton);
 		}
 	}
 
@@ -426,6 +393,7 @@
 			var existingInput = createFolderForm.querySelector('input[name="fatherFolderid"]');
 			if (existingInput) {
 				createFolderForm.removeChild(existingInput);
+				console.log("rimosso input nascosto");
 			}
 
 			var input = document.createElement("input");
@@ -433,10 +401,13 @@
 			input.name = "fatherFolderid";
 			input.value = fatherFolderId;
 			createFolderForm.appendChild(input);
+			
+			
 			// Aggiungi un event listener per l'evento submit
 			createFolderForm.addEventListener('submit', function(e) {
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
-
+				// Evita che altri listener precedentemente registrati su questo evento vengano "svegliati"
+				e.stopImmediatePropagation(); 
 				makeCall("POST", "CreateFolder", createFolderForm, function(req) {
 
 					if (req.readyState == XMLHttpRequest.DONE) {
@@ -457,12 +428,12 @@
 
 					self.reset();
 				});
-			}, { once: true }); // Usa { once: true } per rimuovere l'event listener dopo la prima esecuzione
+			}, false);
 		}
 
 	}
-	
-	
+
+
 	// alert = div che mostra i messaggi di alert
 	// formContainer = <div id="div_createFolder"> 
 	// orchestrator = riferimento al PageOrchestrator per aggiornare la pagina se necessario
@@ -500,6 +471,9 @@
 			// Aggiungi un event listener per l'evento submit
 			createDocumentForm.addEventListener('submit', function(e) {
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
+				// Evita che altri listener precedentemente registrati su questo evento vengano "svegliati"
+				e.stopImmediatePropagation();
+				
 				//console.log(createDocumentForm);
 				makeCall("POST", "CreateDocument", createDocumentForm, function(req) {
 
@@ -527,8 +501,100 @@
 	}
 
 	// finestra modale di conferma quando cerco di modificare un documento
-	function AlertContainer() {
-		this.show = function() {
+	// modalContainer = <div id="modal"> contenitore della finestra modale
+	function AlertContainer(_modalContainer, _alertContainer, _orchestrator) {
+		this.modalContainer = _modalContainer;
+		this.alert = _alertContainer;
+		this.orchestrator = _orchestrator;
+		this.modalText = document.getElementById("elementToDelete");
+		this.closeBtn = document.querySelector(".close-btn");
+		this.confirmBtn = document.getElementById("confirmBtn");
+		this.cancelBtn = document.getElementById("cancelBtn");
+
+		// mostra la finestra modale di conferma
+		// bool == true se l'elemento da eliminare è un documento, false se è una cartella 
+		this.show = function(elementId, elementName, bool) {
+			this.modalText.textContent = elementName;
+			if (bool)
+				this.modalContainer.setAttribute("docToDeleteId", elementId);
+			else
+				this.modalContainer.setAttribute("folderToDeleteId", elementId);
+			this.modalContainer.style.display = "block";
+		}
+
+		var self = this;
+		// Chiude la finestra modale
+		this.close = function() {
+			self.modalContainer.removeAttribute("folderToDeleteId");
+			self.modalContainer.removeAttribute("docToDeleteId");
+			self.modalContainer.style.display = "none";
+		}
+
+		// Chiudi la finestra modale quando si clicca sulla X
+		this.closeBtn.onclick = this.close;
+
+		// Chiudi la finestra modale quando si clicca sul pulsante Annulla
+		this.cancelBtn.onclick = this.close;
+
+		// Gestione comportamento del pulsante Conferma
+		this.confirmBtn.onclick = function() {
+			// gestisci eliminazioni
+			if (self.modalContainer.getAttribute("docToDeleteId") != null) {
+				// ELIMINAZIONE DI UN DOCUMENTO
+				var docToDeleteId = self.modalContainer.getAttribute("docToDeleteId");
+				//console.log("eliminare documento con id: " + docToDeleteId);
+				makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
+					function(req) {
+						if (req.readyState == XMLHttpRequest.DONE) {
+							var message = req.responseText;
+							switch (req.status) {
+								case 200:
+									self.orchestrator.refresh();
+									break;
+								case 400: // bad request	
+								case 500: // server error
+									self.alert.textContent = message;
+									break;
+							}
+						}
+						else {
+							self.alert.textContent = message;
+						}
+					}
+				);
+			}
+			else {
+				// ELIMINAZIONE DI UNA CARTELLA
+				var folderToDeleteId = self.modalContainer.getAttribute("folderToDeleteId");
+				//console.log("eliminare cartella con id: " + folderToDeleteId);
+				makeCall("GET", 'DeleteElement?folderId=' + folderToDeleteId, null,
+					function(req) {
+						if (req.readyState == XMLHttpRequest.DONE) {
+							var message = req.responseText;
+							switch (req.status) {
+								case 200:
+									self.orchestrator.refresh();
+									break;
+								case 400: // bad request	
+								case 500: // server error
+									self.alert.textContent = message;
+									break;
+							}
+						}
+						else {
+							self.alert.textContent = message;
+						}
+					}
+				);
+			}
+			self.close();
+		}
+
+		// Chiudi la finestra modale se si clicca al di fuori della finestra modale
+		window.onclick = function(event) {
+			if (event.target == modal) {
+				self.close();
+			}
 		}
 	}
 
@@ -541,7 +607,8 @@
 		var treeContainer = document.getElementById("id_tree");
 		var treeBodyContainer = document.getElementById("id_treebody");
 		var formContainerFolder = document.getElementById("div_createFolder");
-		var formContainerDocument = document.getElementById("div_createDocument")
+		var formContainerDocument = document.getElementById("div_createDocument");
+		var modalContainer = document.getElementById("modal");
 
 		this.start = function() {
 			// Visualizzazione messaggio di benvenuto personalizzato
@@ -552,10 +619,13 @@
 
 			//Creazione dell'oggetto createFolderForm
 			createFolderForm = new CreateFolderForm(this, alert, formContainerFolder);
-			
+
 			//creazione dell'oggetto createDocumentForm
 			createDocumentForm = new CreateDocumentForm(this, alert, formContainerDocument);
-			
+
+			// Caricamento della finestra modale di conferma per eliminare un elemento
+			alertContainer = new AlertContainer(modalContainer, alert, this);
+
 		};
 
 		this.refresh = function() { // currentMission initially null at start

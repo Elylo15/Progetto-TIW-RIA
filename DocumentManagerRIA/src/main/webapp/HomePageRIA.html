@@ -43,7 +43,7 @@
 		<form id="createDocument_form" method="POST">
 			<fieldset>
 				<p>
-					<span id="fatherFolderDocument"></span>
+					Nome della cartella padre: <span id="fatherFolderDocument"></span>
 				</p>
 				<p>
 					Nome da dare : <input type="text" name="documentName" required/>
@@ -59,6 +59,16 @@
 				<input type="submit" name="Crea documento">
 			</fieldset>
 		</form>
+	</div>
+	
+	<!-- Finestra Modale -->
+	<div id="modal" class="modal">
+		<div class="modal-content">
+			<span class="close-btn">&times;</span>
+			<p>Sei sicuro di voler eliminare <span id="elementToDelete"></span> ?</p>
+			<button id="confirmBtn">Conferma</button>
+			<button id="cancelBtn">Annulla</button>
+		</div>
 	</div>
 </body>
 </html>
