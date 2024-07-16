@@ -185,7 +185,7 @@
 					var docToDeleteId = ev.dataTransfer.getData("docId");
 					// CONTROLLO SE HO DROPPATO UN DOCUMENTO O UNA CARTELLA
 					if (docToDeleteId !== "" && !isNaN(docToDeleteId)) {
-						
+
 						// ELIMINAZIONE del DOCUMENTO
 						makeCall("GET", 'DeleteElement?documentId=' + docToDeleteId, null,
 							function(req) {
@@ -382,15 +382,26 @@
 		this.formContainer = _formContainer;
 		this.alert = _alert;
 
-		this.reset = function(){
+		this.reset = function() {
 			this.formContainer.style.visibility = "hidden";
-			//fare pulizia dei paramentri
+			// fare pulizia dei parametri, rimuoviamo l'input hidden se presente
+			var hiddenInput = document.querySelector('input[name="fatherFolderid"]');
+			if (hiddenInput && hiddenInput.parentElement === this.formContainer) {
+            	this.formContainer.removeChild(hiddenInput);
+        	}
 		}
 		this.show = function() {
 			var self = this;
 			this.formContainer.style.visibility = "visible";
 			var createFolderForm = document.getElementById("createFolder_form");
 			var fatherFolderId = this.formContainer.getAttribute("fatherfolderid");
+
+			// Rimuoviamo eventuali input hidden esistenti prima di aggiungerne uno nuovo
+			var existingInput = createFolderForm.querySelector('input[name="fatherFolderid"]');
+			if (existingInput) {
+				createFolderForm.removeChild(existingInput);
+			}
+
 			var input = document.createElement("input");
 			input.type = "hidden";
 			input.name = "fatherFolderid";
@@ -417,47 +428,48 @@
 					else {
 						self.alert.textContent = message;
 					}
+
+					self.reset();
 				});
-			});
-
-		}
-
+			}, { once: true }); // Usa { once: true } per rimuovere l'event listener dopo la prima esecuzione
 	}
 
-	// finestra modale di conferma quando cerco di modificare un documento
-	function AlertContainer(){
-		this.show = function(){
-		}
+}
+
+// finestra modale di conferma quando cerco di modificare un documento
+function AlertContainer() {
+	this.show = function() {
 	}
+}
 
 
 
 
-	// Handles page loading and refreshing
-	function PageOrchestrator() {
-		var alert = document.getElementById("id_alert");
-		var treeContainer = document.getElementById("id_tree");
-		var treeBodyContainer = document.getElementById("id_treebody");
-		var formContainer = document.getElementById("div_createFolder");
+// Handles page loading and refreshing
+function PageOrchestrator() {
+	var alert = document.getElementById("id_alert");
+	var treeContainer = document.getElementById("id_tree");
+	var treeBodyContainer = document.getElementById("id_treebody");
+	var formContainer = document.getElementById("div_createFolder");
 
-		this.start = function() {
-			// Visualizzazione messaggio di benvenuto personalizzato
-			var usrNameContainer = document.getElementById("id_username");
-			usrNameContainer.textContent = sessionStorage.getItem('username');
+	this.start = function() {
+		// Visualizzazione messaggio di benvenuto personalizzato
+		var usrNameContainer = document.getElementById("id_username");
+		usrNameContainer.textContent = sessionStorage.getItem('username');
 
-			folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
+		folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
 
-			//Creazione dell'oggetto createFolderForm
-			createFolderForm = new CreateFolderForm(this, alert, formContainer);
-		};
+		//Creazione dell'oggetto createFolderForm
+		createFolderForm = new CreateFolderForm(this, alert, formContainer);
+	};
 
-		this.refresh = function() { // currentMission initially null at start
-			alert.textContent = "";        // not null after creation of status change
+	this.refresh = function() { // currentMission initially null at start
+		alert.textContent = "";        // not null after creation of status change
 
-			// restart del folderTree
-			folderTree.reset();
-			folderTree.show();
-			createFolderForm.reset();
-		};
-	}
+		// restart del folderTree
+		folderTree.reset();
+		folderTree.show();
+		createFolderForm.reset();
+	};
+}
 }	
