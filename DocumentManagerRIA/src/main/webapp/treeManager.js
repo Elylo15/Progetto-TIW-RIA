@@ -483,7 +483,7 @@
 			var self = this;
 			this.formContainer.style.visibility = "visible";
 			var createDocumentForm = document.getElementById("createDocument_form");
-			console.log(createDocumentForm);
+			//console.log(createDocumentForm);
 			var fatherFolderId = this.formContainer.getAttribute("fatherfolderid");
 
 			// Rimuoviamo eventuali input hidden esistenti prima di aggiungerne uno nuovo
@@ -500,7 +500,7 @@
 			// Aggiungi un event listener per l'evento submit
 			createDocumentForm.addEventListener('submit', function(e) {
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
-				console.log(createDocumentForm);
+				//console.log(createDocumentForm);
 				makeCall("POST", "CreateDocument", createDocumentForm, function(req) {
 
 					if (req.readyState == XMLHttpRequest.DONE) {

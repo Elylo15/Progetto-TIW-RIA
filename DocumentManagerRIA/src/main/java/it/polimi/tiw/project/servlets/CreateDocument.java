@@ -33,11 +33,18 @@ public class CreateDocument extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		User u = null;
 		HttpSession s = request.getSession();
-		User u = (User) s.getAttribute("user");
+		if (s.isNew() || s.getAttribute("user") == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Non loggato");
+			return;
+		} else {
+			u = (User) s.getAttribute("user");
+		}
 		String id = request.getParameter("fatherFolderid");
 		Integer folderID;
-		System.out.println("id: " + id);
+		//System.out.println("id: " + id);
 		if (id == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Parametro fatherFolderid non valido");
@@ -45,7 +52,7 @@ public class CreateDocument extends HttpServlet {
 		}
 		try {
 			folderID = Integer.parseInt(id);
-			System.out.println("folderID: " + folderID);
+			//System.out.println("folderID: " + folderID);
 		} catch (NumberFormatException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Parametro folderID con formato non numerico");
@@ -53,7 +60,7 @@ public class CreateDocument extends HttpServlet {
 		}
 		// prendo il nome della cartella che devo creare
 		String foldername = request.getParameter("documentName");
-		System.out.println("foldername: " + foldername);
+		//System.out.println("foldername: " + foldername);
 		if (foldername == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Parametro folderName non è valido");
@@ -61,7 +68,7 @@ public class CreateDocument extends HttpServlet {
 		}
 		// prendo il nome del documento che devo creare
 		String type = request.getParameter("type");
-		System.out.println("type: " + type);
+		//System.out.println("type: " + type);
 		if (type == null) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			response.getWriter().println("Parametro type non è valido");
