@@ -1,6 +1,6 @@
 {
 	// Page components
-	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator(), createFolderForm;
+	let folderTree, documentInfo, pageOrchestrator = new PageOrchestrator(), createFolderForm, createDocumentForm;
 
 	// on HomePageRia.html load function
 	window.addEventListener("load", () => {
@@ -48,7 +48,7 @@
 							
 							self.update(self.treebodycontainer, treeToShow); // self visible by closure
 							self.createBin(self.treebodycontainer);
-							self.addRootFolderButton(self.treecontainer);
+							self.rootFolderButtonOnClick(document.getElementById("addRootFolderButton"));
 						} else if (req.status == 403) {
 							// Utente non autorizzato, lo slogga
 							window.location.href = req.getResponseHeader("Location");
@@ -83,6 +83,9 @@
 
 				//aggiunta dei bottoni per aggiungere sottocartelle
 				self.addButtonsSubFolder(folderContainer);
+				
+				//aggiunta dei bottoni per aggingere documenti
+				self.addDocumentButton(folderContainer);
 
 
 				//per mettere le cartelle drop
@@ -372,20 +375,28 @@
 			folderContainer.appendChild(addSubfolderButton);
 		}
 
-		this.addRootFolderButton = function(parentElement) {
-			//Aggiungi bottone per crea cartella padre
-			var addRootFolderButton = document.createElement("button");
-			addRootFolderButton.textContent = "Aggiungi Cartella Padre";
+		this.rootFolderButtonOnClick = function(addRootFolderButton) {
 			addRootFolderButton.addEventListener("click", function() {
 				// Mostra il form per creare una nuova cartella padre
 				document.getElementById("fatherFolder").textContent = "Folder0";
 				document.getElementById("div_createFolder").setAttribute("fatherFolderId", "0");
 				createFolderForm.show();
 			});
-			parentElement.appendChild(addRootFolderButton);
+		}
+		
+		this.addDocumentButton = function(folderContainer) {
+			//Aggiungi bottone per crea cartella padre
+			var addRootFolderButton = document.createElement("button");
+			addRootFolderButton.textContent = "Aggiungi Documento";
+			addRootFolderButton.addEventListener("click", function() {
+				// Mostra il form per creare una nuova cartella padre
+				document.getElementById("fatherFolderDocument").textContent = folderContainer.children[1].textContent;
+				document.getElementById("div_createDocument").setAttribute("fatherFolderId", folderContainer.getAttribute("folderid"));
+				createDocumentForm.show();
+			});
+			folderContainer.appendChild(addRootFolderButton);
 
 		}
-
 	}
 
 
@@ -450,6 +461,70 @@
 		}
 
 	}
+	
+	
+	// alert = div che mostra i messaggi di alert
+	// formContainer = <div id="div_createFolder"> 
+	// orchestrator = riferimento al PageOrchestrator per aggiornare la pagina se necessario
+	function CreateDocumentForm(_orchestrator, _alert, _formContainer) {
+		this.orchestrator = _orchestrator;
+		this.formContainer = _formContainer;
+		this.alert = _alert;
+
+		this.reset = function() {
+			this.formContainer.style.visibility = "hidden";
+			// fare pulizia dei parametri, rimuoviamo l'input hidden se presente
+			var hiddenInput = document.querySelector('input[name="fatherFolderid"]');
+			if (hiddenInput && hiddenInput.parentElement === this.formContainer) {
+				this.formContainer.removeChild(hiddenInput);
+			}
+		}
+		this.show = function() {
+			var self = this;
+			this.formContainer.style.visibility = "visible";
+			var createDocumentForm = document.getElementById("createDocument_form");
+			console.log(createDocumentForm);
+			var fatherFolderId = this.formContainer.getAttribute("fatherfolderid");
+
+			// Rimuoviamo eventuali input hidden esistenti prima di aggiungerne uno nuovo
+			var existingInput = createDocumentForm.querySelector('input[name="fatherFolderid"]');
+			if (existingInput) {
+				createDocumentForm.removeChild(existingInput);
+			}
+
+			var input = document.createElement("input");
+			input.type = "hidden";
+			input.name = "fatherFolderid";
+			input.value = fatherFolderId;
+			createDocumentForm.appendChild(input);
+			// Aggiungi un event listener per l'evento submit
+			createDocumentForm.addEventListener('submit', function(e) {
+				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
+				console.log(createDocumentForm);
+				makeCall("POST", "CreateDocument", createDocumentForm, function(req) {
+
+					if (req.readyState == XMLHttpRequest.DONE) {
+						var message = req.responseText;
+						switch (req.status) {
+							case 200:
+								self.orchestrator.refresh();
+								break;
+							case 400: // bad request	
+							case 500: // server error
+								self.alert.textContent = message;
+								break;
+						}
+					}
+					else {
+						self.alert.textContent = message;
+					}
+
+					self.reset();
+				});
+			}, { once: true }); // Usa { once: true } per rimuovere l'event listener dopo la prima esecuzione
+		}
+
+	}
 
 	// finestra modale di conferma quando cerco di modificare un documento
 	function AlertContainer() {
@@ -465,7 +540,8 @@
 		var alert = document.getElementById("id_alert");
 		var treeContainer = document.getElementById("id_tree");
 		var treeBodyContainer = document.getElementById("id_treebody");
-		var formContainer = document.getElementById("div_createFolder");
+		var formContainerFolder = document.getElementById("div_createFolder");
+		var formContainerDocument = document.getElementById("div_createDocument")
 
 		this.start = function() {
 			// Visualizzazione messaggio di benvenuto personalizzato
@@ -475,7 +551,11 @@
 			folderTree = new FolderTree(alert, treeContainer, treeBodyContainer, this);
 
 			//Creazione dell'oggetto createFolderForm
-			createFolderForm = new CreateFolderForm(this, alert, formContainer);
+			createFolderForm = new CreateFolderForm(this, alert, formContainerFolder);
+			
+			//creazione dell'oggetto createDocumentForm
+			createDocumentForm = new CreateDocumentForm(this, alert, formContainerDocument);
+			
 		};
 
 		this.refresh = function() { // currentMission initially null at start

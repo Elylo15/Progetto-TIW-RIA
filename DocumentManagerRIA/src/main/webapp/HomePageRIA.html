@@ -17,6 +17,7 @@
 	<div id="id_alert" class="alertmessage"></div>
 	<div id="id_tree">
 		<h2>Lista delle tue cartelle:</h2>
+		<input type="button" id="addRootFolderButton" value="Aggiungi Cartella Padre">
 		<ul id="id_treebody">
 			
 		</ul>
@@ -42,13 +43,10 @@
 		<form id="createDocument_form" method="POST">
 			<fieldset>
 				<p>
-					<label for="folderId">Sceglie cartella in cui vuoi mettere il documento:</label>
-					<select name="folderId" id="folderId">
-						<!--  aggiunte dinamenete -->
-					</select>
+					<span id="fatherFolderDocument"></span>
 				</p>
 				<p>
-					Nome da dare : <input type="text" name="documentName" requires/>
+					Nome da dare : <input type="text" name="documentName" required/>
 				</p>
 				<p>
 					<label>Sceglie il tipo di documento:</label>
