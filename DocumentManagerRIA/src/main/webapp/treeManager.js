@@ -41,15 +41,18 @@
 						var message = req.responseText;
 						if (req.status == 200) {
 							var treeToShow = JSON.parse(req.responseText);
-							if (treeToShow.length == 0) {
+
+							if (treeToShow == null) {
 								self.alert.textContent = "Non ci sono cartelle o documenti da mostrare!";
+								self.addRootFolderButton(document.getElementById("addRootFolderButton"));
+
 								return;
 							}
 
 							self.update(self.treebodycontainer, treeToShow); // self visible by closure
 							self.createBin(self.treebodycontainer);
 							self.addRootFolderButton(document.getElementById("addRootFolderButton"));
-							
+
 						} else if (req.status == 403) {
 							// Utente non autorizzato, lo slogga
 							window.location.href = req.getResponseHeader("Location");
@@ -123,7 +126,7 @@
 
 						//per mettere i documenti draggabili
 						self.setUpDraggableDocs(documentItem);
-						
+
 						// per aggiungere i bottoni per vedere i dettagli
 						self.addDocInfoButton(documentItem);
 					});
@@ -345,7 +348,7 @@
 
 			folderContainer.appendChild(addSubfolderButton);
 		}
-		
+
 		// aggiunge i bottoni per creare le cartelle padre
 		this.addRootFolderButton = function(addRootFolderButton) {
 			addRootFolderButton.addEventListener("click", function() {
@@ -355,7 +358,7 @@
 				createFolderForm.show();
 			});
 		}
-		
+
 		// aggiunge i bottoni per creare i documenti
 		this.addDocumentButton = function(folderContainer) {
 			// Aggiungi bottone per creare un documento
@@ -369,9 +372,9 @@
 			});
 			folderContainer.appendChild(addDocumentButton);
 		}
-		
+
 		// aggiunge i bottoni per accedere alle informazioni sui documenti
-		this.addDocInfoButton = function(docContainer){
+		this.addDocInfoButton = function(docContainer) {
 			var addDocInfoButton = document.createElement("button");
 			addDocInfoButton.textContent = "Visualizza dettagli";
 			addDocInfoButton.addEventListener("click", function() {
@@ -416,13 +419,13 @@
 			input.name = "fatherFolderid";
 			input.value = fatherFolderId;
 			createFolderForm.appendChild(input);
-			
-			
+
+
 			// Aggiungi un event listener per l'evento submit
 			createFolderForm.addEventListener('submit', function(e) {
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
 				// Evita che altri listener precedentemente registrati su questo evento vengano "svegliati"
-				e.stopImmediatePropagation(); 
+				e.stopImmediatePropagation();
 				makeCall("POST", "CreateFolder", createFolderForm, function(req) {
 
 					if (req.readyState == XMLHttpRequest.DONE) {
@@ -488,7 +491,7 @@
 				e.preventDefault(); // Impedisce il comportamento predefinito di submit del form
 				// Evita che altri listener precedentemente registrati su questo evento vengano "svegliati"
 				e.stopImmediatePropagation();
-				
+
 				//console.log(createDocumentForm);
 				makeCall("POST", "CreateDocument", createDocumentForm, function(req) {
 
@@ -612,10 +615,10 @@
 			}
 		}
 	}
-	
+
 	// Pannello che mostra le informazioni del documento
 	// docInfoContainer = <div id="div_documentInfo"> div che contine il pannello
-	function DocumentInfo(_docInfoContainer, _alertContainer){
+	function DocumentInfo(_docInfoContainer, _alertContainer) {
 		this.docInfoContainer = _docInfoContainer;
 		this.docName = document.getElementById("docName");
 		this.documentName = document.getElementById("documentName");
@@ -623,14 +626,18 @@
 		this.documentDate = document.getElementById("documentDate");
 		this.documentType = document.getElementById("documentType");
 		this.documentDigest = document.getElementById("documentDigest");
-		
+
 		this.alert = _alertContainer;
-		
 		var self = this;
-		this.show = function(docId){
-			if(isNaN(docId))
+
+		this.close = function() {
+			self.docInfoContainer.style.visibility = "hidden";
+		}
+
+		this.show = function(docId) {
+			if (isNaN(docId))
 				self.alert.textContent = "Identificativo del documento non valido";
-			else{
+			else {
 				makeCall("GET", 'GetDocument?documentId=' + docId, null,
 					function(req) {
 						if (req.readyState == XMLHttpRequest.DONE) {
@@ -658,10 +665,10 @@
 					}
 				);
 			}
-				
+
 		}
-		
-		
+
+
 	}
 
 
@@ -692,10 +699,14 @@
 
 			// Caricamento della finestra modale di conferma per eliminare un elemento
 			alertContainer = new AlertContainer(modalContainer, alert, this);
-			
+
 			// Caricamento del pannello che contiene informazioni sul documento
 			documentInfo = new DocumentInfo(docInfoContainer, alert);
 
+
+			document.querySelector("a[href='Logout']").addEventListener('click', () => {
+				window.sessionStorage.removeItem('username');
+			})
 		};
 
 		this.refresh = function() { // currentMission initially null at start
@@ -705,6 +716,8 @@
 			folderTree.reset();
 			folderTree.show();
 			createFolderForm.reset();
+			createDocumentForm.reset();
+			documentInfo.close();
 		};
 	}
 }	

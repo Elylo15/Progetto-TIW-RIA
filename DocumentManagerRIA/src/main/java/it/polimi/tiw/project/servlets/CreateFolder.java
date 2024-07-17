@@ -33,9 +33,15 @@ public class CreateFolder extends HttpServlet {
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		User u = null;
 		HttpSession s = request.getSession();
-		User u = (User) s.getAttribute("user");
-		
+		if (s.isNew() || s.getAttribute("user") == null) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			response.getWriter().println("Non loggato");
+			return;
+		} else {
+			u = (User) s.getAttribute("user");
+		}
 		// prendo id della cartella in cui si vuole aggiungere una sottocartella
 		String id = request.getParameter("fatherFolderid");
 		Integer folderID;
@@ -69,11 +75,11 @@ public class CreateFolder extends HttpServlet {
 			response.getWriter().println("Failure in user's folder creation");
 			return;
 		}
-		
+
 		response.setStatus(HttpServletResponse.SC_OK);
 		response.setContentType("text/plain");
-        response.setCharacterEncoding("UTF-8");
-        response.getWriter().write("La cartella è stata aggiunta con successo!");
+		response.setCharacterEncoding("UTF-8");
+		response.getWriter().write("La cartella è stata aggiunta con successo!");
 	}
 
 }
