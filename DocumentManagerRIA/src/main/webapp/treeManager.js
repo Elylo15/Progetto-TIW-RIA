@@ -53,9 +53,9 @@
 							self.createBin(self.treebodycontainer);
 							self.addRootFolderButton(document.getElementById("addRootFolderButton"));
 
-						} else if (req.status == 403) {
+						} else if (req.status == 401) {
 							// Utente non autorizzato, lo slogga
-							window.location.href = req.getResponseHeader("Location");
+							window.location.href = "index.html";
 							window.sessionStorage.removeItem('username');
 						} else {
 							// generico errore ricevuto dal server
@@ -290,6 +290,11 @@
 											case 200:
 												self.orchestrator.refresh();
 												break;
+											case 401:
+												// Utente non autorizzato, lo slogga
+												window.location.href = "index.html";
+												window.sessionStorage.removeItem('username');
+												break;
 											case 400: // bad request	
 											case 500: // server error
 												self.alert.textContent = message;
@@ -434,6 +439,11 @@
 							case 200:
 								self.orchestrator.refresh();
 								break;
+							case 401:
+								// Utente non autorizzato, lo slogga
+								window.location.href = "index.html";
+								window.sessionStorage.removeItem('username');
+								break;
 							case 400: // bad request	
 							case 500: // server error
 								self.alert.textContent = message;
@@ -500,6 +510,11 @@
 						switch (req.status) {
 							case 200:
 								self.orchestrator.refresh();
+								break;
+							case 401:
+								// Utente non autorizzato, lo slogga
+								window.location.href = "index.html";
+								window.sessionStorage.removeItem('username');
 								break;
 							case 400: // bad request	
 							case 500: // server error
@@ -569,6 +584,11 @@
 								case 200:
 									self.orchestrator.refresh();
 									break;
+								case 401:
+									// Utente non autorizzato, lo slogga
+									window.location.href = "index.html";
+									window.sessionStorage.removeItem('username');
+									break;
 								case 400: // bad request	
 								case 500: // server error
 									self.alert.textContent = message;
@@ -592,6 +612,11 @@
 							switch (req.status) {
 								case 200:
 									self.orchestrator.refresh();
+									break;
+								case 401:
+									// Utente non autorizzato, lo slogga
+									window.location.href = "index.html";
+									window.sessionStorage.removeItem('username');
 									break;
 								case 400: // bad request	
 								case 500: // server error
@@ -652,6 +677,11 @@
 									self.documentType.textContent = docInfo.type;
 									self.documentDigest.textContent = docInfo.digest;
 									self.docInfoContainer.style.visibility = "visible";
+									break;
+								case 401:
+									// Utente non autorizzato, lo slogga
+									window.location.href = "index.html";
+									window.sessionStorage.removeItem('username');
 									break;
 								case 400: // bad request	
 								case 500: // server error
