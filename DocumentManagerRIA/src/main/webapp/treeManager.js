@@ -739,8 +739,8 @@
 			})
 		};
 
-		this.refresh = function() { // currentMission initially null at start
-			alert.textContent = "";        // not null after creation of status change
+		this.refresh = function() { 
+			alert.textContent = "";
 
 			// restart del folderTree
 			folderTree.reset();
