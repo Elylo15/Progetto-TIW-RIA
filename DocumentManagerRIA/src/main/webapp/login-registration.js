@@ -76,22 +76,15 @@
 
 	// verifica email
 	document.getElementById('emailR').addEventListener('input', validateEmail);
-	
-	//visibilita della password di login
-	document.getElementById('pwd').addEventListener('input', () => {
-		togglePasswordVisibility('pwd');
-	});
 
 	//verifica password e la visibilità	della password di registrazione
 	document.getElementById('pwdR').addEventListener('input', () => {
 		validatePassword();
-		togglePasswordVisibility('pwdR');
 	});
 
 	//verifica password e la visibilità	della repeat password di registrazione
 	document.getElementById('repeatpwdR').addEventListener('input', () => {
 		validatePassword();
-		togglePasswordVisibility('repeatpwdR');
 	});
 
 
@@ -109,25 +102,6 @@
 			error.textContent = "";
 			return true;
 
-		}
-	}
-
-	function togglePasswordVisibility(pwdId) {
-		var pwdInput = document.getElementById(pwdId);
-		var showPasswordCheckbox;
-
-		if (pwdId === 'pwd') {
-			showPasswordCheckbox = document.getElementById('showPasswordLogin');
-		} else if (pwdId === 'pwdR') {
-			showPasswordCheckbox = document.getElementById('showPasswordRegister');
-		} else if (pwdId === 'repeatpwdR') {
-			showPasswordCheckbox = document.getElementById('showRepeaterPasswordRegister');
-		}
-
-		if (showPasswordCheckbox && showPasswordCheckbox.checked) {
-			pwdInput.type = 'text';
-		} else {
-			pwdInput.type = 'password';
 		}
 	}
 
