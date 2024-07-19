@@ -16,7 +16,7 @@
 						switch (x.status) {
 							case 200:
 								sessionStorage.setItem('username', message);
-								console.log("login ok");
+								// console.log("login ok");
 								window.location.href = "HomePageRIA.html";
 								break;
 							case 400: // bad request
@@ -74,15 +74,15 @@
 		document.getElementById('loginForm').classList.add('hidden');
 	});
 
-	// verifica email
+	// verifica email mentre scrivi
 	document.getElementById('emailR').addEventListener('input', validateEmail);
 
-	//verifica password e la visibilità	della password di registrazione
+	//verifica password mentre scrivi
 	document.getElementById('pwdR').addEventListener('input', () => {
 		validatePassword();
 	});
 
-	//verifica password e la visibilità	della repeat password di registrazione
+	//verifica password ripetuta mentre scrivi
 	document.getElementById('repeatpwdR').addEventListener('input', () => {
 		validatePassword();
 	});

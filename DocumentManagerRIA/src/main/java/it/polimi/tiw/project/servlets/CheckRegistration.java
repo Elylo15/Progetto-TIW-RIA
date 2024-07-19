@@ -87,7 +87,7 @@ public class CheckRegistration extends HttpServlet {
 			u = new User(usrn, pwd, email);
 			// Imposta altri attributi di 'u' se necessario
 		} catch (SQLException e) {
-			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
+			response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			response.getWriter().println("Database error while creating user");
 			return;
 		}
