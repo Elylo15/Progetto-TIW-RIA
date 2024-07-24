@@ -60,7 +60,7 @@ public class CheckRegistration extends HttpServlet {
 
 		try {
 			// Controlla se l'utente esiste già
-			u = usrDAO.checkExistence(usrn, pwd,email);
+			u = usrDAO.checkExistence(usrn,email);
 		} catch (SQLException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_GATEWAY);
 			response.getWriter().println("Database error while checking user existence");

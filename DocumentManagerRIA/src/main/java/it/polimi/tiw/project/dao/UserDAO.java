@@ -23,38 +23,40 @@ public class UserDAO {
 					return null;
 				else {
 					result.next();
-					User user = new User(result.getString("username"), result.getString("email"), result.getString("password"));
+					User user = new User(result.getString("username"), result.getString("email"),
+							result.getString("password"));
 					return user;
 				}
 			}
 		}
 	}
-	
-	public User checkExistence(String usrn, String pwd, String email) throws SQLException {
-		String query = "SELECT  username, email, password FROM user  WHERE username = ? AND password =? AND email = ?";
+
+	// controlla l'esistenza di uno user nel database
+	public User checkExistence(String usrn, String email) throws SQLException {
+		String query = "SELECT  username, email, password FROM user WHERE username = ? AND email = ?";
 		try (PreparedStatement pstatement = con.prepareStatement(query);) {
 			pstatement.setString(1, usrn);
-			pstatement.setString(2, pwd);
-			pstatement.setString(3, email);
+			pstatement.setString(2, email);
 			try (ResultSet result = pstatement.executeQuery();) {
 				if (!result.isBeforeFirst()) // no results, credential check failed
 					return null;
 				else {
 					result.next();
-					User user = new User(result.getString("username"), result.getString("email"), result.getString("password"));
+					User user = new User(result.getString("username"), result.getString("email"),
+							result.getString("password"));
 					return user;
 				}
 			}
 		}
 	}
-	
+
 	public void createUser(String usrn, String pwd, String email) throws SQLException {
-		  String query = "INSERT INTO user (username, email, password) VALUES (?, ?, ?)";
-		    try (PreparedStatement pstatement = con.prepareStatement(query);) {
-		        pstatement.setString(1, usrn);
-		        pstatement.setString(2, email);
-		        pstatement.setString(3, pwd);
-		        pstatement.executeUpdate(); // Esegue l'aggiornamento
-		    }
+		String query = "INSERT INTO user (username, email, password) VALUES (?, ?, ?)";
+		try (PreparedStatement pstatement = con.prepareStatement(query);) {
+			pstatement.setString(1, usrn);
+			pstatement.setString(2, email);
+			pstatement.setString(3, pwd);
+			pstatement.executeUpdate(); // Esegue l'aggiornamento
+		}
 	}
 }
